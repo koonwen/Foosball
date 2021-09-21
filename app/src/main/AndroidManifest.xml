@@ -10,7 +10,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Foosball">
         <activity
+            android:name=".LobbyActivity"
+            android:screenOrientation="landscape"
+            android:exported="true" />
+        <activity
             android:name=".MainActivity"
+            android:screenOrientation="landscape"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
