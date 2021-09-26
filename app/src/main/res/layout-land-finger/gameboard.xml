@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.motion.widget.MotionLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:layoutDescription="@xml/gameboard_scene"
     tools:layout_editor_absoluteX="91dp"
     tools:layout_editor_absoluteY="-2dp">
 
@@ -30,26 +29,24 @@
         android:id="@+id/view4"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginStart="64dp"
-        android:layout_marginTop="56dp"
-        android:layout_marginEnd="64dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginEnd="56dp"
         android:background="@drawable/oval_red"
         app:layout_constraintBottom_toTopOf="@+id/view5"
-        app:layout_constraintEnd_toStartOf="@+id/view7"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/view10"
+        app:layout_constraintEnd_toStartOf="@+id/view3"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
         app:layout_constraintVertical_chainStyle="spread_inside" />
 
     <View
         android:id="@+id/view10"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginStart="80dp"
         android:layout_marginTop="100dp"
+        android:layout_marginEnd="52dp"
         android:background="@drawable/oval_blue"
         app:layout_constraintBottom_toTopOf="@+id/view11"
-        app:layout_constraintStart_toEndOf="@+id/view"
+        app:layout_constraintEnd_toStartOf="@+id/view4"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.616"
         app:layout_constraintVertical_chainStyle="spread_inside" />
@@ -58,21 +55,22 @@
         android:id="@+id/view11"
         android:layout_width="50dp"
         android:layout_height="50dp"
+        android:layout_marginEnd="52dp"
         android:layout_marginBottom="100dp"
         android:background="@drawable/oval_blue"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view10"
-        tools:layout_editor_absoluteX="136dp" />
+        app:layout_constraintEnd_toStartOf="@+id/view5"
+        app:layout_constraintTop_toBottomOf="@+id/view10" />
 
     <View
         android:id="@+id/view12"
         android:layout_width="50dp"
         android:layout_height="50dp"
+        android:layout_marginStart="52dp"
         android:layout_marginTop="100dp"
-        android:layout_marginEnd="80dp"
         android:background="@drawable/oval_red"
         app:layout_constraintBottom_toTopOf="@+id/view13"
-        app:layout_constraintEnd_toStartOf="@+id/view2"
+        app:layout_constraintStart_toEndOf="@+id/view8"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.616"
         app:layout_constraintVertical_chainStyle="spread_inside" />
@@ -81,76 +79,71 @@
         android:id="@+id/view13"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginEnd="80dp"
+        android:layout_marginStart="52dp"
         android:layout_marginBottom="100dp"
         android:background="@drawable/oval_red"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/view2"
+        app:layout_constraintStart_toEndOf="@+id/view8"
         app:layout_constraintTop_toBottomOf="@+id/view12" />
 
     <View
         android:id="@+id/view7"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginTop="56dp"
+        android:layout_marginStart="56dp"
+        android:layout_marginTop="48dp"
         android:background="@drawable/oval_blue"
         app:layout_constraintBottom_toTopOf="@+id/view8"
+        app:layout_constraintStart_toEndOf="@+id/view3"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="spread_inside"
-        tools:layout_editor_absoluteX="384dp" />
+        app:layout_constraintVertical_chainStyle="spread_inside" />
 
     <View
         android:id="@+id/view5"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginStart="64dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginEnd="64dp"
-        android:layout_marginBottom="30dp"
+        android:layout_marginTop="38dp"
+        android:layout_marginEnd="56dp"
+        android:layout_marginBottom="39dp"
         android:background="@drawable/oval_red"
         app:layout_constraintBottom_toTopOf="@+id/view6"
-        app:layout_constraintEnd_toStartOf="@+id/view8"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/view10"
-        app:layout_constraintTop_toBottomOf="@+id/view4"
-        app:layout_constraintVertical_bias="0.473" />
+        app:layout_constraintEnd_toStartOf="@+id/view3"
+        app:layout_constraintTop_toBottomOf="@+id/view4" />
 
     <View
         android:id="@+id/view8"
         android:layout_width="50dp"
         android:layout_height="50dp"
+        android:layout_marginStart="56dp"
         android:layout_marginTop="30dp"
-        android:layout_marginEnd="64dp"
         android:layout_marginBottom="30dp"
         android:background="@drawable/oval_blue"
         app:layout_constraintBottom_toTopOf="@+id/view9"
-        app:layout_constraintEnd_toStartOf="@+id/view12"
+        app:layout_constraintStart_toEndOf="@+id/view3"
         app:layout_constraintTop_toBottomOf="@+id/view7" />
 
     <View
         android:id="@+id/view9"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginEnd="64dp"
+        android:layout_marginStart="56dp"
         android:layout_marginBottom="56dp"
         android:background="@drawable/oval_blue"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/view12"
+        app:layout_constraintStart_toEndOf="@+id/view3"
         app:layout_constraintTop_toBottomOf="@+id/view8" />
 
     <View
         android:id="@+id/view6"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginStart="64dp"
-        android:layout_marginEnd="64dp"
+        android:layout_marginEnd="56dp"
         android:layout_marginBottom="56dp"
         android:background="@drawable/oval_red"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/view9"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/view11"
-        app:layout_constraintTop_toBottomOf="@+id/view5" />
+        app:layout_constraintEnd_toStartOf="@+id/view3"
+        app:layout_constraintTop_toBottomOf="@+id/view5"
+        app:layout_constraintVertical_bias="1.0" />
 
     <androidx.constraintlayout.widget.Group
         android:id="@+id/group"
@@ -178,4 +171,15 @@
         android:layout_height="wrap_content"
         app:constraint_referenced_ids="view12,view13" />
 
-</androidx.constraintlayout.motion.widget.MotionLayout>
+    <View
+        android:id="@+id/view3"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="#D6D6D6"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
