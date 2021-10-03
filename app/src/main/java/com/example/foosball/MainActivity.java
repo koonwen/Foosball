@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 
 public class MainActivity extends FullScreenActivity {
 
@@ -19,8 +20,16 @@ public class MainActivity extends FullScreenActivity {
         createGame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), LobbyActivity.class);
-                startActivity(intent);
+                EditText inputText = findViewById(R.id.playerName);
+                String playerName = inputText.getText().toString();
+                if (playerName.trim().isEmpty()) {
+                    inputText.setError("Please fill in name");
+                    inputText.requestFocus();
+                } else {
+                    Utils.setPlayerName(getApplicationContext(), playerName);
+                    Intent intent = new Intent(getApplicationContext(), LobbyActivity.class);
+                    startActivity(intent);
+                }
             }
         });
         joinGame.setOnClickListener(new View.OnClickListener() {

@@ -31,15 +31,15 @@
                 android:textSize="48sp" />
 
             <EditText
-                android:id="@+id/editTextTextPersonName"
+                android:id="@+id/playerName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
+                android:hint="Player name"
                 android:imeOptions="actionDone|flagNoExtractUi"
                 android:importantForAutofill="no"
                 android:inputType="textPersonName"
-                android:minHeight="48dp"
-                android:text="Player name" />
+                android:minHeight="48dp" />
 
             <Button
                 android:id="@+id/createGame"
@@ -48,15 +48,15 @@
                 android:text="Create Game" />
 
             <EditText
-                android:id="@+id/editTextTextPersonName2"
+                android:id="@+id/gameCode"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
+                android:hint="Enter code"
                 android:imeOptions="actionDone|flagNoExtractUi"
                 android:importantForAutofill="no"
                 android:inputType="textPersonName"
-                android:minHeight="48dp"
-                android:text="Enter code" />
+                android:minHeight="48dp" />
 
             <Button
                 android:id="@+id/joinGame"
