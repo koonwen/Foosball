@@ -94,6 +94,12 @@
                 android:layout_height="wrap_content"
                 android:text="Start Game" />
 
+            <Button
+                android:id="@+id/returnMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="RETURN TO MENU" />
+
         </LinearLayout>
 
         <Space
