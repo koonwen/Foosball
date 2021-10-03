@@ -27,6 +27,7 @@ public class MainActivity extends FullScreenActivity {
                     inputText.requestFocus();
                 } else {
                     Utils.setPlayerName(getApplicationContext(), playerName);
+                    Database.createGame(playerName);
                     Intent intent = new Intent(getApplicationContext(), LobbyActivity.class);
                     startActivity(intent);
                 }
