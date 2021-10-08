@@ -29,3 +29,16 @@ TODO:
 1. Generate our own shortened game code and use that to store as the document id
 2. Figure out Firestore rules (currently there is no authentication)
 3. Figure out how everyone else should handle Firebase credentials
+
+## 6 October 2021
+### Change gameboard layout to programmatically implemented
+*Update by: Eddie & Koon*
+1. Force landscape orientation in manifest file.
+2. Replaced gameboard layout with `main.xml`.
+3. Added new drawing package with `Gameboard` class of rendering elements.
+4. `GameActivity` acts as controller to control positions.
+5. Started `models` package but classes are not in use at the moment.
+
+TODO:
+1. To clean up Gameboard class and set up Foosman class to generate the foosmen on the layout instead.
+2. Plan collision detection implementation for ball with any foosman.
