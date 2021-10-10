@@ -14,7 +14,7 @@ public class Database {
     // TODO: Generate our own shortened game code and use that to store as the document id
     // TODO: Figure out Firestore rules (currently there is no authentication)
     // TODO: Figure out how everyone else should handle Firebase credentials
-    public static void createGame(String playerName) {
+    public static void createGame(String playerName, OnDatabaseOperation onDatabaseOperation) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         final String gameCode = Utils.generateGameCode();
         // Check if gameCode already exists in the database
@@ -25,10 +25,21 @@ public class Database {
 
         Log.d(TAG, "Creating game and storing in firebase realtime database");
         DatabaseReference ref = database.getReference("games").child(gameCode);
-        ref.child("player1").setValue(playerName);
-        ref.child("player2").setValue("");
-        ref.child("player3").setValue("");
-        ref.child("player4").setValue("");
+        ref.get().addOnCompleteListener(task -> {
+            if (!task.isSuccessful()) {
+                Log.e("firebase", "Error getting data", task.getException());
+                onDatabaseOperation.onError();
+            } else {
+                if (Objects.requireNonNull(task.getResult()).exists()) {
+                    Log.d(TAG, "Game code already exists");
+                    createGame(playerName, onDatabaseOperation);
+                } else {
+                    Log.d(TAG, "game code does not exist");
+                    ref.child("player1").setValue(playerName);
+                    onDatabaseOperation.onSuccess();
+                }
+            }
+        });
     }
 
 
@@ -62,3 +73,4 @@ public class Database {
         });
     }
 }
+
