@@ -21,7 +21,7 @@ public class Database {
         ref.get().addOnCompleteListener(task -> {
             if (!task.isSuccessful()) {
                 Log.e("firebase", "Error getting data", task.getException());
-                onDatabaseOperation.onError();
+                onDatabaseOperation.onConnectionError();
             } else {
                 // Check if gameCode already exists in the database
                 DataSnapshot res = Objects.requireNonNull(task.getResult());
@@ -58,17 +58,22 @@ public class Database {
         onDatabaseOperation.onSuccess();
     }
 
-
-    public static void joinGame(String playerName, String gameCode) {
+    public static void joinGame(String playerName, String gameCode, OnDatabaseOperation onDatabaseOperation) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference ref = database.getReference("games").child(gameCode);
         ref.get().addOnCompleteListener(task -> {
             if (!task.isSuccessful()) {
                 Log.e("firebase", "Error getting data", task.getException());
+                onDatabaseOperation.onConnectionError();
             } else {
                 // Checks if gamecode exists by accessing result from the task
+                // Also check if game has neither started nor ended
                 DataSnapshot res = Objects.requireNonNull(task.getResult());
-                if (res.exists()) {
+                Object gameStarted = res.child("hasGameStarted").getValue();
+                Object gameEnded = res.child("hasGameEnded").getValue();
+
+                if (res.exists() && gameEnded != null && !(boolean) gameEnded && gameStarted != null
+                        && !(boolean) gameStarted) {
                     String[] playerKeys = {"player1", "player2", "player3", "player4"};
 
                     // Checks whether keys of playernames exists, if not insert current player
@@ -76,12 +81,17 @@ public class Database {
                     for (String playerKey : playerKeys) {
                         if (!res.child(playerKey).exists()) {
                             ref.child(playerKey).setValue(playerName);
+                            onDatabaseOperation.onSuccess();
                             return;
                         }
                     }
-                    Log.e(TAG, "Lobby is full", task.getException());
+                    String eMsg = "Lobby is full. Please try again later.";
+                    Log.d(TAG, eMsg);
+                    onDatabaseOperation.onInputError(eMsg);
                 } else {
-                    Log.e(TAG, "Game does not exist", task.getException());
+                    String eMsg = "Game does not exist. Please check game code.";
+                    Log.d(TAG, eMsg);
+                    onDatabaseOperation.onInputError(eMsg);
                 }
             }
         });
