@@ -28,7 +28,7 @@ public class MainActivity extends FullScreenActivity {
                 EditTextplayerName.requestFocus();
             } else {
                 Utils.setPlayerName(getApplicationContext(), playerName);
-                Database.createGame(playerName, new OnDatabaseOperation() {
+                Database.createGame(playerName, getApplicationContext(), new OnDatabaseOperation() {
 
                     @Override
                     public void onConnectionError() {

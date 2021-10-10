@@ -12,22 +12,19 @@ public class LobbyActivity extends FullScreenActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lobby);
-        final String playerName = Utils.getPlayerName(this);
+        final String playerName = Utils.getPlayerName(getApplicationContext());
         TextView player1Text = findViewById(R.id.player1Text);
         player1Text.setText(playerName);
 
-        final String gameCode = Utils.getGameCode(this);
+        final String gameCode = Utils.getGameCode(getApplicationContext());
         TextView gameCodeText = findViewById(R.id.codeID);
         gameCodeText.setText(gameCode);
 
 
         Button returnMenu = findViewById(R.id.returnMenu);
-        returnMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                startActivity(intent);
-            }
+        returnMenu.setOnClickListener(view -> {
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(intent);
         });
     }
 }
