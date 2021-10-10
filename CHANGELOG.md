@@ -42,3 +42,14 @@ TODO:
 TODO:
 1. To clean up Gameboard class and set up Foosman class to generate the foosmen on the layout instead.
 2. Plan collision detection implementation for ball with any foosman.
+
+## 10 October 2021
+### Add networking functionality to create game and join game buttons in menu
+*Update by: Bernard and Tristan*
+1. Create game button creates a new database entry
+2. Join game button checks for existing db entry by game code and adds player id to db entry
+
+TODO:
+1. Handle logic for player1 as the "host" (all updates to the game to be handled through player1 to prevent concurrency issues)
+2. Add functionality to pull values from game in database to lobby screen (i.e. player names)
+3. Add ping functionality on lobby screen to update player names in real time
