@@ -11,17 +11,10 @@ import java.util.Objects;
 public class Database {
     public static final String TAG = "Database";
 
-    // TODO: Generate our own shortened game code and use that to store as the document id
-    // TODO: Figure out Firestore rules (currently there is no authentication)
-    // TODO: Figure out how everyone else should handle Firebase credentials
+    // TODO: Figure out Firebase Database rules (currently there is no authentication)
     public static void createGame(String playerName, OnDatabaseOperation onDatabaseOperation) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         final String gameCode = Utils.generateGameCode();
-        // Check if gameCode already exists in the database
-        // If gameCode does no exist, then use it
-        // If gameCode exists, check if the game has ended
-        // If game ended, then delete that document, and create a new one with the same gameCode
-        // If game has not ended, then don't delete that document. Generate a new gameCode and loop.
 
         Log.d(TAG, "Creating game and storing in firebase realtime database");
         DatabaseReference ref = database.getReference("games").child(gameCode);
@@ -30,18 +23,40 @@ public class Database {
                 Log.e("firebase", "Error getting data", task.getException());
                 onDatabaseOperation.onError();
             } else {
-                if (Objects.requireNonNull(task.getResult()).exists()) {
-                    Log.d(TAG, "Game code already exists");
-                    createGame(playerName, onDatabaseOperation);
+                // Check if gameCode already exists in the database
+                DataSnapshot res = Objects.requireNonNull(task.getResult());
+                if (res.exists()) {
+                    Log.d(TAG, "Game code " + gameCode + " already exists");
+                    Object hasGameEnded = res.child("hasGameEnded").getValue();
+
+                    // If gameCode exists, check if the game has ended
+                    if ((hasGameEnded == null) || !(boolean) hasGameEnded) {
+                        Log.d(TAG, "Game has not ended. Trying a new game code");
+                        // If game has not ended, generate a new gameCode and restart
+                        createGame(playerName, onDatabaseOperation);
+                    } else {
+                        Log.d(TAG, "Game has ended. Deleting and creating a new document");
+                        // If game ended, then delete that document
+                        // and create a new one with the same gameCode
+                        ref.removeValue();
+                        setUpNewGame(ref, playerName, onDatabaseOperation);
+                    }
                 } else {
-                    Log.d(TAG, "game code does not exist");
-                    ref.child("player1").setValue(playerName);
-                    onDatabaseOperation.onSuccess();
+                    // If gameCode does no exist, then use it
+                    Log.d(TAG, "Creating game with game code " + gameCode);
+                    setUpNewGame(ref, playerName, onDatabaseOperation);
                 }
             }
         });
     }
 
+    private static void setUpNewGame(DatabaseReference ref, String playerName,
+                                     OnDatabaseOperation onDatabaseOperation) {
+        ref.child("player1").setValue(playerName);
+        ref.child("hasGameStarted").setValue(playerName);
+        ref.child("hasGameEnded").setValue(playerName);
+        onDatabaseOperation.onSuccess();
+    }
 
 
     public static void joinGame(String playerName, String gameCode) {
@@ -50,8 +65,7 @@ public class Database {
         ref.get().addOnCompleteListener(task -> {
             if (!task.isSuccessful()) {
                 Log.e("firebase", "Error getting data", task.getException());
-            }
-            else {
+            } else {
                 // Checks if gamecode exists by accessing result from the task
                 DataSnapshot res = Objects.requireNonNull(task.getResult());
                 if (res.exists()) {
