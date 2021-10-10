@@ -31,4 +31,16 @@ public class Utils {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         return preferences.getString(preferenceGameCode, "");
     }
+
+    public static String generateGameCode() {
+        final String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        final int numCharacters = 6;
+        final StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < numCharacters; i++) {
+            final int index = (int) (characters.length() * Math.random());
+            final char character = characters.charAt(index);
+            stringBuilder.append(character);
+        }
+        return stringBuilder.toString();
+    }
 }
