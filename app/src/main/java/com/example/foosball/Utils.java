@@ -7,6 +7,7 @@ import android.preference.PreferenceManager;
 public class Utils {
     private static final String preferencePlayerName = "playerName";
     private static final String preferenceGameCode = "gameCode";
+    public static final int NUM_CHARS_GAME_CODE = 6;
 
     public static void setPlayerName(Context context, String playerName) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
