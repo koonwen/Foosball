@@ -1,19 +1,39 @@
 package com.example.foosball.models;
 
+import android.graphics.Point;
+import android.graphics.Rect;
+
 public class Foosman {
-    private Position pos;
 
-    public Foosman(float x, float y) {
-        this.pos = new Position(x,y);
-    }
-    public Position getPosition() {
-        return this.pos;
+    private Point point = new Point(-1, -1);
+    private Rect bounds;
+
+    public Foosman() {
     }
 
-    @Override
-    public String toString() {
-        return "Ball{" +
-                "pos=" + pos +
-                '}';
+    public void setPoint(int X, int Y) {
+        this.point = new Point(X, Y);
+    }
+
+    public int getPointX() { return this.point.x; }
+
+    public int getPointY() {
+        return this.point.y;
+    }
+
+    public Rect getBounds() {
+        return bounds;
+    }
+
+    public void setBounds(Rect bounds) {
+        this.bounds = bounds;
+    }
+
+    public int getWidth() {
+        return bounds.width();
+    }
+
+    public int getHeight() {
+        return bounds.height();
     }
 }

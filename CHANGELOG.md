@@ -53,3 +53,12 @@ TODO:
 1. Handle logic for player1 as the "host" (all updates to the game to be handled through player1 to prevent concurrency issues)
 2. Add functionality to pull values from game in database to lobby screen (i.e. player names)
 3. Add ping functionality on lobby screen to update player names in real time
+
+### 10 October 2021
+*Update by Koon and Eddie*
+1. Extracted Gameboard sprite into Foosman class
+2. Refactored GameActivity to implement Foosman class
+
+TODO:
+1. Continue Refactoring Ball class
+2. Refactor GameActivity to use Ball class
