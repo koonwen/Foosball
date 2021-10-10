@@ -1,6 +1,7 @@
 package com.example.foosball;
 
-public interface OnDatabaseOperation {
-    void onError();
-    void onSuccess();
+public abstract class OnDatabaseOperation {
+    void onConnectionError() {};
+    void onInputError(String errorMessage) {};
+    void onSuccess() {};
 }
