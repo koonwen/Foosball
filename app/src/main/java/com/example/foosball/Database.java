@@ -2,15 +2,8 @@ package com.example.foosball;
 
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.HashMap;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class Database {
     public static final String TAG = "Database";
@@ -19,22 +12,19 @@ public class Database {
     // TODO: Figure out Firestore rules (currently there is no authentication)
     // TODO: Figure out how everyone else should handle Firebase credentials
     public static void createGame(String playerName) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        HashMap<String, Object> game = new HashMap<>();
-        game.put("player1", playerName);
-        Task<DocumentReference> task = db.collection("games")
-                .add(game)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error adding document", e);
-                    }
-                });
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        final String gameCode = Utils.generateGameCode();
+        // Check if gameCode already exists in the database
+        // If gameCode does no exist, then use it
+        // If gameCode exists, check if the game has ended
+        // If game ended, then delete that document, and create a new one with the same gameCode
+        // If game has not ended, then don't delete that document. Generate a new gameCode and loop.
+
+        Log.d(TAG, "Creating game and storing in firebase realtime database");
+        DatabaseReference ref = database.getReference("games").child(gameCode);
+        ref.child("player1").setValue(playerName);
+        ref.child("player2").setValue("");
+        ref.child("player3").setValue("");
+        ref.child("player4").setValue("");
     }
 }
