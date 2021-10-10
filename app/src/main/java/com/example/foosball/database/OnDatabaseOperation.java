@@ -1,5 +1,5 @@
 package com.example.foosball.database;
 
-public interface OnDatabaseOperation {
+interface OnDatabaseOperation {
     void onConnectionError();
 }

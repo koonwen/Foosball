@@ -6,28 +6,21 @@ import android.text.InputFilter;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.example.foosball.database.Database;
 import com.example.foosball.database.OnCreateGameOperation;
-import com.example.foosball.database.OnDatabaseOperation;
 import com.example.foosball.database.OnJoinGameOperation;
 import com.google.android.material.snackbar.Snackbar;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 public class MainActivity extends FullScreenActivity {
-
-    private Button createGame;
-    private Button joinGame;
+    public static final int HOST_PLAYER_ID = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        createGame = findViewById(R.id.createGame);
-        joinGame = findViewById(R.id.joinGame);
+        final Button createGame = findViewById(R.id.createGame);
+        final Button joinGame = findViewById(R.id.joinGame);
 
         final EditText editTextGameCode = findViewById(R.id.gameCode);
         final InputFilter[] filters = {
@@ -37,7 +30,7 @@ public class MainActivity extends FullScreenActivity {
         editTextGameCode.setFilters(filters);
 
         createGame.setOnClickListener(view -> {
-            String playerName = getPlayerName();
+            final String playerName = getPlayerName();
             if (playerName == null) {
                 return;
             }
@@ -49,17 +42,19 @@ public class MainActivity extends FullScreenActivity {
 
                 @Override
                 public void onSuccess(String gameCode) {
+                    Utils.setPlayerId(getApplicationContext(), HOST_PLAYER_ID);
                     goToLobbyScreen(gameCode);
                 }
             });
         });
 
         joinGame.setOnClickListener(view -> {
-            String playerName = getPlayerName();
+            editTextGameCode.setError(null);
+            final String playerName = getPlayerName();
             if (playerName == null) {
                 return;
             }
-            String gameCode = getGameCode();
+            final String gameCode = getGameCode();
             if (gameCode == null) {
                 return;
             }
@@ -88,7 +83,8 @@ public class MainActivity extends FullScreenActivity {
                 }
 
                 @Override
-                public void onSuccess() {
+                public void onSuccess(int playerId) {
+                    Utils.setPlayerId(getApplicationContext(), playerId);
                     goToLobbyScreen(gameCode);
                 }
             });
@@ -96,8 +92,8 @@ public class MainActivity extends FullScreenActivity {
     }
 
     private String getPlayerName() {
-        EditText editTextPlayerName = findViewById(R.id.playerName);
-        String playerName = editTextPlayerName.getText().toString().trim();
+        final EditText editTextPlayerName = findViewById(R.id.playerName);
+        final String playerName = editTextPlayerName.getText().toString().trim();
 
         if (playerName.isEmpty()) {
             editTextPlayerName.setError("Please fill in name");
@@ -127,13 +123,13 @@ public class MainActivity extends FullScreenActivity {
     }
 
     private void displaySnackbar(String message) {
-        View root = findViewById(R.id.root);
+        final View root = findViewById(R.id.root);
         Snackbar.make(root, message, Snackbar.LENGTH_SHORT).show();
     }
 
     private void goToLobbyScreen(String gameCode) {
         Utils.setGameCode(getApplicationContext(), gameCode);
-        Intent intent = new Intent(getApplicationContext(), LobbyActivity.class);
+        final Intent intent = new Intent(getApplicationContext(), LobbyActivity.class);
         startActivity(intent);
     }
 }
