@@ -124,9 +124,11 @@ public class Database {
         ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                int[] coord = (int[]) dataSnapshot.getValue();
+                ArrayList<?> coord = (ArrayList<?>) dataSnapshot.getValue();
                 assert coord != null;
-                onGetBallCoordsOperation.onSuccess(coord[0], coord[1]);
+                final int x = ((Long) coord.get(0)).intValue();
+                final int y = ((Long) coord.get(1)).intValue();
+                onGetBallCoordsOperation.onSuccess(x, y);
             }
 
             @Override
