@@ -10,6 +10,9 @@ import android.widget.Button;
 
 import com.example.foosball.drawing.GameBoard;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 
@@ -50,23 +53,33 @@ public class GameActivity extends FullScreenActivity implements OnClickListener 
     //Increase the velocity towards five or decrease
     //back to one depending on state
     private void updateVelocity() {
-        int xDir = (sprite2Velocity.x > 0) ? 1 : -1;
-        int yDir = (sprite2Velocity.y > 0) ? 1 : -1;
+        int xDir = (ballVelocity.x > 0) ? 1 : -1;
+        int yDir = (ballVelocity.y > 0) ? 1 : -1;
         int speed = 0;
-        if (isAccelerating) {
-            speed = Math.abs(sprite2Velocity.x)+1;
+        if (ballVelocity.x > 7) {
+            speed = Math.abs(ballVelocity.x)+1;
         } else {
-            speed = Math.abs(sprite2Velocity.x)-1;
+            speed = Math.abs(ballVelocity.x);
         }
-        if (speed>8) speed =8;
-        if (speed<1) speed =1;
-        if (hasCollided) {
-            sprite2Velocity.x *= -1;
-            sprite2Velocity.y *= -1;
+        ballVelocity.x=speed*xDir;
+        ballVelocity.y=speed*yDir;
+//        int speed = 0;
+//        if (isAccelerating) {
+//            speed = Math.abs(ballVelocity.x)+1;
+//        } else {
+//            speed = Math.abs(ballVelocity.x)-1;
+//        }
+//        if (speed>8) speed =8;
+//        if (speed<1) speed =1;
+//        ballVelocity.x=speed*xDir;
+//        ballVelocity.y=speed*yDir;
+    }
+
+    private void checkCollision() {
+        if (((GameBoard)findViewById(R.id.the_canvas)).wasCollisionDetected()) {
+            ballVelocity.x *= 1.1;
+            ballVelocity.x *= -1;
             hasCollided = false;
-        } else {
-            sprite2Velocity.x=speed*xDir;
-            sprite2Velocity.y=speed*yDir;
         }
     }
 
@@ -93,57 +106,45 @@ public class GameActivity extends FullScreenActivity implements OnClickListener 
         return new Point (x,y);
     }
 
-//    private Point getRandomPoint() {
-//        Random r = new Random();
-//        int minX = 0;
-//        int maxX = findViewById(R.id.the_canvas).getWidth() - ((GameBoard)findViewById(R.id.the_canvas)).getSprite1Width();
-//        int x = 0;
-//        int minY = 0;
-//        int maxY = findViewById(R.id.the_canvas).getHeight() - ((GameBoard)findViewById(R.id.the_canvas)).getSprite1Height();
-//        int y = 0;
-//        x = r.nextInt(maxX-minX+1)+minX;
-//        y = r.nextInt(maxY-minY+1)+minY;
-//        return new Point (x,y);
-//    }
-
     synchronized public void initGfx() {
         ((GameBoard)findViewById(R.id.the_canvas)).resetStarField();
         Point pBall, pTeamAGoalie, pTeamADefender1, pTeamADefender2, pTeamAAttacker1, pTeamAAttacker2, pTeamAAttacker3,
                 pTeamBGoalie, pTeamBDefender1, pTeamBDefender2, pTeamBAttacker1, pTeamBAttacker2, pTeamBAttacker3;
 
+        List<String> foosmanNames = Arrays.asList("TeamAGoalie", "TeamADefender1",
+                "TeamADefender2", "TeamAAttacker1", "TeamAAttacker2", "TeamAAttacker3", "TeamBGoalie",
+                "TeamBDefender1", "TeamBDefender2", "TeamBAttacker1", "TeamBAttacker2", "TeamBAttacker3");
+
         // Generate Positions
-        pTeamAGoalie = new Point ((int) (findViewById(R.id.the_canvas).getWidth() * 0.5), (int) (findViewById(R.id.the_canvas).getHeight() * 0.5));
-//        pTeamADefender1 = (findViewById(R.id.the_canvas).getWidth() * 0.20, findViewById(R.id.the_canvas).getHeight() * 0.625);
-//        pTeamADefender2 = (findViewById(R.id.the_canvas).getWidth() * 0.20, findViewById(R.id.the_canvas).getHeight() * 0.375);
-//        pTeamAAttacker1 = (findViewById(R.id.the_canvas).getWidth() * 0.60, findViewById(R.id.the_canvas).getHeight() * 0.75);
-//        pTeamAAttacker2 = (findViewById(R.id.the_canvas).getWidth() * 0.60, findViewById(R.id.the_canvas).getHeight() * 0.50);
-//        pTeamAAttacker3 = (findViewById(R.id.the_canvas).getWidth() * 0.60, findViewById(R.id.the_canvas).getHeight() * 0.25);
-//        pTeamBGoalie = (findViewById(R.id.the_canvas).getWidth() * 0.95, findViewById(R.id.the_canvas).getHeight() * 0.50);
-//        pTeamBDefender1 = (findViewById(R.id.the_canvas).getWidth() * 0.80, findViewById(R.id.the_canvas).getHeight() * 0.625);
-//        pTeamBDefender2 = (findViewById(R.id.the_canvas).getWidth() * 0.80, findViewById(R.id.the_canvas).getHeight() * 0.375);
-//        pTeamBAttacker1 = (findViewById(R.id.the_canvas).getWidth() * 0.40, findViewById(R.id.the_canvas).getHeight() * 0.75);
-//        pTeamBAttacker2 = (findViewById(R.id.the_canvas).getWidth() * 0.40, findViewById(R.id.the_canvas).getHeight() * 0.50);
-//        pTeamBAttacker3 = (findViewById(R.id.the_canvas).getWidth() * 0.40, findViewById(R.id.the_canvas).getHeight() * 0.25);
-//        pBall = (findViewById(R.id.the_canvas).getWidth() * 0.50, findViewById(R.id.the_canvas).getHeight() * 0.50);
+        int canvasWidth = findViewById(R.id.the_canvas).getWidth();
+        int canvasHeight = findViewById(R.id.the_canvas).getHeight();
+
+        pTeamAGoalie = new Point ((int) (canvasWidth * 0.05), (int) (canvasHeight * 0.5));
+        pTeamADefender1 = new Point ((int) (canvasWidth * 0.20), (int) (canvasHeight * 0.625));
+        pTeamADefender2 = new Point ((int) (canvasWidth * 0.20), (int) (canvasHeight * 0.375));
+        pTeamAAttacker1 = new Point ((int) (canvasWidth * 0.60), (int) (canvasHeight * 0.75));
+        pTeamAAttacker2 = new Point ((int) (canvasWidth * 0.60), (int) (canvasHeight * 0.50));
+        pTeamAAttacker3 = new Point ((int) (canvasWidth * 0.60), (int) (canvasHeight * 0.25));
+        pTeamBGoalie = new Point ((int) (canvasWidth * 0.90), (int) (canvasHeight * 0.50));
+        pTeamBDefender1 = new Point ((int) (canvasWidth * 0.80), (int) (canvasHeight * 0.625));
+        pTeamBDefender2 = new Point ((int) (canvasWidth * 0.80), (int) (canvasHeight * 0.375));
+        pTeamBAttacker1 = new Point ((int) (canvasWidth * 0.40), (int) (canvasHeight * 0.75));
+        pTeamBAttacker2 = new Point ((int) (canvasWidth * 0.40), (int) (canvasHeight * 0.50));
+        pTeamBAttacker3 = new Point ((int) (canvasWidth * 0.40), (int) (canvasHeight * 0.25));
+        pBall = new Point((int) (canvasWidth * 0.50), (int) (canvasHeight * 0.50));
+
+        List<Point> foosmanPoints = Arrays.asList(pTeamAGoalie, pTeamADefender1, pTeamADefender2, pTeamAAttacker1, pTeamAAttacker2, pTeamAAttacker3,
+                pTeamBGoalie, pTeamBDefender1, pTeamBDefender2, pTeamBAttacker1, pTeamBAttacker2, pTeamBAttacker3);
 
         // Set Positions
-        ((GameBoard)findViewById(R.id.the_canvas)).TeamAGoalie.setPoint(pTeamAGoalie.x, pTeamAGoalie.y);
-//        ((GameBoard)findViewById(R.id.the_canvas)).TeamADefender1.setPoint(TeamADefender1.x, TeamADefender1.y);
-//        ((GameBoard)findViewById(R.id.the_canvas)).TeamADefender2.setPoint(TeamADefender2.x, TeamADefender2.y);
-//        ((GameBoard)findViewById(R.id.the_canvas)).TeamAAttacker1.setPoint(TeamAAttacker1.x, TeamAAttacker1.y);
-//        ((GameBoard)findViewById(R.id.the_canvas)).TeamAAttacker2.setPoint(TeamAAttacker2.x, TeamAAttacker2.y);
-//        ((GameBoard)findViewById(R.id.the_canvas)).TeamAAttacker3.setPoint(TeamAAttacker3.x, TeamAAttacker3.y);
-//        ((GameBoard)findViewById(R.id.the_canvas)).TeamBGoalie.setPoint(TeamBGoalie.x, TeamBGoalie.y);
-//        ((GameBoard)findViewById(R.id.the_canvas)).TeamBDefender1.setPoint(TeamBDefender1.x, TeamBDefender1.y);
-//        ((GameBoard)findViewById(R.id.the_canvas)).TeamBDefender2.setPoint(TeamBDefender2.x, TeamBDefender2.y);
-//        ((GameBoard)findViewById(R.id.the_canvas)).TeamBAttacker1.setPoint(TeamBAttacker1.x, TeamBAttacker1.y);
-//        ((GameBoard)findViewById(R.id.the_canvas)).TeamBAttacker2.setPoint(TeamBAttacker2.x, TeamBAttacker2.y);
-//        ((GameBoard)findViewById(R.id.the_canvas)).TeamBAttacker3.setPoint(TeamBAttacker3.x, TeamBAttacker3.y);
-//        ((GameBoard)findViewById(R.id.the_canvas)).setBall(pBall.x, pBall.y);
+        for (int i = 0; i < foosmanNames.size(); i++) {
+            ((GameBoard)findViewById(R.id.the_canvas)).getFoosman(foosmanNames.get(i)).setPoint(foosmanPoints.get(i).x - 50, foosmanPoints.get(i).y - 50);
+        }
+        ((GameBoard)findViewById(R.id.the_canvas)).setBall(pBall.x, pBall.y);
 
 //        sprite1Velocity = getRandomVelocity();
 //        sprite2Velocity = new Point(1,1);
-//        ballVelocity = getRandomVelocity();
+        ballVelocity = new Point(5,5);
 
 //        sprite1MaxX = findViewById(R.id.the_canvas).getWidth() - ((GameBoard)findViewById(R.id.the_canvas)).getSprite1Width();
 //        sprite1MaxY = findViewById(R.id.the_canvas).getHeight() - ((GameBoard)findViewById(R.id.the_canvas)).getSprite1Height();
@@ -168,19 +169,21 @@ public class GameActivity extends FullScreenActivity implements OnClickListener 
 //            if (((GameBoard)findViewById(R.id.the_canvas)).wasCollisionDetected()) {
 //                hasCollided = true;
 //                updateVelocity();
-//                Point collisionPoint = ((GameBoard)findViewById(R.id.the_canvas)).getLastCollision();
+////                Point collisionPoint = ((GameBoard)findViewById(R.id.the_canvas)).getLastCollision();
 //            }
-//            frame.removeCallbacks(frameUpdate);
+            frame.removeCallbacks(frameUpdate);
+
+            checkCollision();
 //
 //            //Add our call to increase or decrease velocity
-//            updateVelocity();
+            updateVelocity();
 
 //            Point sprite1 = new Point (((GameBoard)findViewById(R.id.the_canvas)).getSprite1X(),
 //                    ((GameBoard)findViewById(R.id.the_canvas)).getSprite1Y()) ;
 //            Point sprite2 = new Point (((GameBoard)findViewById(R.id.the_canvas)).getSprite2X(),
 //                    ((GameBoard)findViewById(R.id.the_canvas)).getSprite2Y());
-//            Point ball = new Point (((GameBoard)findViewById(R.id.the_canvas)).getBallX(),
-//                    ((GameBoard)findViewById(R.id.the_canvas)).getBallY());
+            Point ball = new Point (((GameBoard)findViewById(R.id.the_canvas)).getBallX(),
+                    ((GameBoard)findViewById(R.id.the_canvas)).getBallY());
 //
 //            // Check if points exceed the canvas
 //            sprite1.x = sprite1.x + sprite1Velocity.x;
@@ -199,14 +202,14 @@ public class GameActivity extends FullScreenActivity implements OnClickListener 
 //            if (sprite2.y > sprite2MaxY || sprite2.y < 5) {
 //                sprite2Velocity.y *= -1;
 //            }
-//            ball.x = ball.x + ballVelocity.x;
-//            if (ball.x > ballMaxX || ball.x < 5) {
-//                ballVelocity.x *= -1;
-//            }
-//            ball.y = ball.y + ballVelocity.y;
-//            if (ball.y > ballMaxY || ball.y < 5) {
-//                ballVelocity.y *= -1;
-//            }
+            ball.x = ball.x + ballVelocity.x;
+            if (ball.x > ballMaxX || ball.x < 5) {
+                ballVelocity.x *= -1;
+            }
+            ball.y = ball.y + ballVelocity.y;
+            if (ball.y > ballMaxY || ball.y < 5) {
+                ballVelocity.y *= -1;
+            }
 
 //            ((GameBoard)findViewById(R.id.the_canvas)).TeamAGoalie.setPoint(TeamAGoalie.x, TeamAGoalie.y);
 //            ((GameBoard)findViewById(R.id.the_canvas)).TeamADefender1.setPoint(pTeamADefender1.x, pTeamADefender1.y);
@@ -220,7 +223,7 @@ public class GameActivity extends FullScreenActivity implements OnClickListener 
 //            ((GameBoard)findViewById(R.id.the_canvas)).TeamBAttacker1.setPoint(pTeamBAttacker1.x, pTeamBAttacker1.y);
 //            ((GameBoard)findViewById(R.id.the_canvas)).TeamBAttacker2.setPoint(pTeamBAttacker2.x, pTeamBAttacker2.y);
 //            ((GameBoard)findViewById(R.id.the_canvas)).TeamBAttacker3.setPoint(pTeamBAttacker3.x, pTeamBAttacker3.y);
-//            ((GameBoard)findViewById(R.id.the_canvas)).setBall(ball.x, ball.y);
+            ((GameBoard)findViewById(R.id.the_canvas)).setBall(ball.x, ball.y);
             ((GameBoard)findViewById(R.id.the_canvas)).invalidate();
             frame.postDelayed(frameUpdate, FRAME_RATE);
         }

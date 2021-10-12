@@ -3,8 +3,11 @@ import com.example.foosball.R;
 import com.example.foosball.models.Foosman;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.TreeMap;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -25,35 +28,37 @@ public class GameBoard extends View{
     private int starFade = 2;
     private Rect ballBounds = new Rect(0,0,0,0);
 
-    public Foosman TeamAGoalie = new Foosman();
+    private List<String> foosmanNames = Arrays.asList("TeamAGoalie", "TeamADefender1",
+            "TeamADefender2", "TeamAAttacker1", "TeamAAttacker2", "TeamAAttacker3", "TeamBGoalie",
+            "TeamBDefender1", "TeamBDefender2", "TeamBAttacker1", "TeamBAttacker2", "TeamBAttacker3");
 
+    private Map<String, Foosman> foosmanMap = new TreeMap<String, Foosman>();
+
+    synchronized  public Foosman getFoosman(String name) {
+        return foosmanMap.get(name);
+    }
+    
     private Point ball;
-    private Bitmap bm1 = null;
-    private Matrix m = null;
     private Bitmap bmBall = null;
     private Matrix mBall = null;
-    private Bitmap bm2 = null;
-    //Collision flag and point
+    private int ballRotation = 0;
+
+    private Bitmap bmTeamA = null;
+    private Bitmap bmTeamB = null;
+
+    // Collision flag and point
     private boolean collisionDetected = false;
     private Point lastCollision = new Point(-1,-1);
 
-//    private int sprite1Rotation = 0;
-    private int ballRotation = 0;
-
     private static final int NUM_OF_STARS = 36;
 
-    //Allow our controller to get and set the sprite positions
-
-    //ball setter
+    // Setter and Getter for Ball
     synchronized public void setBall(int x, int y) {
         ball = new Point(x,y);
     }
-
-    //ball getter
     synchronized public int getBallX() {
         return ball.x;
     }
-
     synchronized public int getBallY() {
         return ball.y;
     }
@@ -61,7 +66,6 @@ public class GameBoard extends View{
     synchronized public void resetStarField() {
         starField = null;
     }
-
     synchronized public int getBallWidth() { return ballBounds.width(); }
 
     synchronized public int getBallHeight() {
@@ -81,18 +85,18 @@ public class GameBoard extends View{
     public GameBoard(Context context, AttributeSet aSet) {
         super(context, aSet);
         p = new Paint();
-        //load our bitmaps and set the bounds for the controller
-//        sprite1 = new Point(-1,-1);
-//        sprite2 = new Point(-1,-1);
-//        ball = new Point(-1,-1);
-        //Define a matrix so we can rotate the asteroid
-//        m = new Matrix();
-//        mBall = new Matrix();
-        bm1 = BitmapFactory.decodeResource(getResources(), R.drawable.ship1);
-        bm2 = BitmapFactory.decodeResource(getResources(), R.drawable.ship2);
+        ball = new Point(-1,-1);
+        mBall = new Matrix();
+        bmTeamA = BitmapFactory.decodeResource(getResources(), R.drawable.ship1);
+        bmTeamB = BitmapFactory.decodeResource(getResources(), R.drawable.ship2);
         bmBall = BitmapFactory.decodeResource(getResources(), R.drawable.ball);
-//        sprite1Bounds = new Rect(0,0, bm1.getWidth(), bm1.getHeight());
-//        sprite2Bounds = new Rect(0,0, bm2.getWidth(), bm2.getHeight());
+
+        // Generate Foosman
+        for (String name : foosmanNames) {
+            foosmanMap.put(name, new Foosman());
+        }
+//        sprite1Bounds = new Rect(0,0, bmTeamA.getWidth(), bmTeamA.getHeight());
+//        sprite2Bounds = new Rect(0,0, bmTeamB.getWidth(), bmTeamB.getHeight());
         ballBounds = new Rect(0,0, bmBall.getWidth(), bmBall.getHeight());
     }
 
@@ -107,77 +111,85 @@ public class GameBoard extends View{
         collisionDetected = false;
     }
 
-//    private boolean checkForCollision() {
+    private boolean checkForCollision() {
 //        if (sprite1.x<0 && sprite2.x<0 && ball.x<0 && sprite1.y<0 && sprite2.y<0 && ball.y<0) return false;
-//        Rect r1 = new Rect(sprite1.x, sprite1.y, sprite1.x + sprite1Bounds.width(),  sprite1.y + sprite1Bounds.height());
-//        Rect r2 = new Rect(sprite2.x, sprite2.y, sprite2.x + sprite2Bounds.width(), sprite2.y + sprite2Bounds.height());
-//        Rect rball = new Rect(ball.x, ball.y, ball.x + ballBounds.width(), ball.y + ballBounds.height());
-//        Rect r3 = new Rect(r1);
 
-        /* TO-DO
-        * Change collision detection for ball bounds only when intersected
-        * with any other bounds (multiple foosmen)
-        *
-        * Note: Current implementation only checks for thw two sprites
-        * when the bounds intersect each other
-        * */
+        // Create bounds for each foosman and the ball
+        List<Rect> foosmanboundsList = new ArrayList<Rect>();
 
-//        if(r1.intersect(r2)) {
-//            for (int i = r1.left; i<r1.right; i++) {
-//                for (int j = r1.top; j<r1.bottom; j++) {
-//                    if (bm1.getPixel(i-r3.left, j-r3.top)!= Color.TRANSPARENT) {
-//                        if (bm2.getPixel(i-r2.left, j-r2.top) != Color.TRANSPARENT) {
-//                            lastCollision = new Point(sprite2.x + i-r2.left, sprite2.y + j-r2.top);
-//                            return true;
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        lastCollision = new Point(-1,-1);
-//        return false;
-//    }
+        for (Map.Entry<String, Foosman> entry : foosmanMap.entrySet()) {
+            Foosman foosman = entry.getValue();
+            int bmWidth = bmTeamA.getWidth(); // Note: Team A and B bm should have the same w & h
+            int bmHeight = bmTeamB.getWidth();
+            int foosmanPointX = foosman.getPointX();
+            int foosmanPointY = foosman.getPointY();
+            Rect r = new Rect(foosmanPointX, foosmanPointY, foosmanPointX + bmWidth, foosmanPointY + bmHeight);
+            foosmanboundsList.add(r);
+        }
+
+        Rect rball = new Rect(ball.x, ball.y, ball.x + ballBounds.width(), ball.y + ballBounds.height());
+
+        for (Rect r : foosmanboundsList) {
+            Rect r3 = rball;
+            if (rball.intersect(r)) {
+                for (int i = rball.left; i<rball.right; i++) {
+                    for (int j = rball.top; j<rball.bottom; j++) {
+                        if (bmBall.getPixel(i-r3.left, j-r3.top) != Color.TRANSPARENT) {
+                            if (bmTeamA.getPixel(i-r.left, j-r.top)!= Color.TRANSPARENT || bmTeamB.getPixel(i-r.left, j-r.top)!= Color.TRANSPARENT) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        lastCollision = new Point(-1,-1);
+        return false;
+    }
 
     @Override
     synchronized public void onDraw(Canvas canvas) {
-
+        // Draw Background
         p.setColor(Color.BLACK);
         p.setAlpha(255);
         p.setStrokeWidth(1);
         canvas.drawRect(0, 0, getWidth(), getHeight(), p);
-
-//        if (starField==null) {
-//            initializeStars(canvas.getWidth(), canvas.getHeight());
-//        }
-//
-//        p.setColor(Color.CYAN);
-//        p.setAlpha(starAlpha+=starFade);
-//        if (starAlpha>=252 || starAlpha <=80) starFade=starFade*-1;
-//        p.setStrokeWidth(5);
-//        for (int i=0; i<NUM_OF_STARS; i++) {
-//            canvas.drawPoint(starField.get(i).x, starField.get(i).y, p);
-//        }
-
-//        if (sprite1.x>=0) {
-//            m.reset();
-//            m.postTranslate((float)(sprite1.x), (float)(sprite1.y));
-//            m.postRotate(sprite1Rotation, (float)(sprite1.x+sprite1Bounds.width()/2.0), (float)(sprite1.y+sprite1Bounds.width()/2.0));
-//            canvas.drawBitmap(bm1, m, null);
-//            sprite1Rotation+=5;
-//            if (sprite1Rotation >= 360) sprite1Rotation=0;
-//        }
-        if (TeamAGoalie.getPointX() >= 0) {
-            canvas.drawBitmap(bm2, TeamAGoalie.getPointX(), TeamAGoalie.getPointY(), null);
+        if (starField==null) {
+            initializeStars(canvas.getWidth(), canvas.getHeight());
         }
-//        if (ball.x>=0) {
-//            mBall.reset();
-//            mBall.postTranslate((float)(ball.x), (float)(ball.y));
-//            mBall.postRotate(ballRotation, (float)(ball.x+ballBounds.width()/2.0), (float)(ball.y+ballBounds.width()/2.0));
-//            canvas.drawBitmap(bmBall, mBall, null);
-//            ballRotation+=5;
-//            if (ballRotation >= 360) ballRotation=0;
-//        }
-//        collisionDetected = checkForCollision();
+        p.setColor(Color.CYAN);
+        p.setAlpha(starAlpha+=starFade);
+        if (starAlpha>=252 || starAlpha <=80) starFade=starFade*-1;
+        p.setStrokeWidth(5);
+        for (int i=0; i<NUM_OF_STARS; i++) {
+            canvas.drawPoint(starField.get(i).x, starField.get(i).y, p);
+        }
+
+        // Draw Foosmen
+        for (Map.Entry<String, Foosman> entry : foosmanMap.entrySet()) {
+            Foosman foosman = entry.getValue();
+            String name = entry.getKey();
+            if (foosman.getPointX() >= 0 && name.startsWith("TeamA")) {
+                canvas.drawBitmap(bmTeamA, foosman.getPointX(), foosman.getPointY(), null);
+            }
+            if (foosman.getPointX() >= 0 && name.startsWith("TeamB")) {
+                canvas.drawBitmap(bmTeamB, foosman.getPointX(), foosman.getPointY(), null);
+            }
+        }
+
+        // Draw Ball
+        if (ball.x>=0) {
+            mBall.reset();
+            mBall.postTranslate((float)(ball.x), (float)(ball.y));
+            mBall.postRotate(ballRotation, (float)(ball.x+ballBounds.width()/2.0), (float)(ball.y+ballBounds.width()/2.0));
+            canvas.drawBitmap(bmBall, mBall, null);
+            ballRotation+=5;
+            if (ballRotation >= 360) ballRotation=0;
+        }
+
+
+        // Draw Points of Collision Detected
+        collisionDetected = checkForCollision();
 //        if (collisionDetected ) {
 //            p.setColor(Color.RED);
 //            p.setAlpha(255);
