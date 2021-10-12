@@ -3,10 +3,11 @@ package com.example.foosball.models;
 import android.graphics.Point;
 import android.graphics.Rect;
 
-public class Foosman {
+public class Foosman implements BoardItem{
 
     private Point point = new Point(-1, -1);
     private Rect bounds;
+    private String name;
 
     public Foosman() {
     }

@@ -19,13 +19,7 @@ import java.util.Random;
 public class GameActivity extends FullScreenActivity implements OnClickListener {
 
     private Handler frame = new Handler();
-    private Point sprite1Velocity;
-    private Point sprite2Velocity;
     private Point ballVelocity;
-    private int sprite1MaxX;
-    private int sprite2MaxY;
-    private int sprite1MaxY;
-    private int sprite2MaxX;
     private int ballMaxY;
     private int ballMaxX;
     //acceleration flag
@@ -76,7 +70,7 @@ public class GameActivity extends FullScreenActivity implements OnClickListener 
     }
 
     private void checkCollision() {
-        if (((GameBoard)findViewById(R.id.the_canvas)).wasCollisionDetected()) {
+        if (((GameBoard)findViewById(R.id.the_canvas)).b.isCollisionDetected()) {
             ballVelocity.x *= 1.1;
             ballVelocity.x *= -1;
             hasCollided = false;
@@ -140,18 +134,12 @@ public class GameActivity extends FullScreenActivity implements OnClickListener 
         for (int i = 0; i < foosmanNames.size(); i++) {
             ((GameBoard)findViewById(R.id.the_canvas)).getFoosman(foosmanNames.get(i)).setPoint(foosmanPoints.get(i).x - 50, foosmanPoints.get(i).y - 50);
         }
-        ((GameBoard)findViewById(R.id.the_canvas)).setBall(pBall.x, pBall.y);
+        ((GameBoard)findViewById(R.id.the_canvas)).b.setPoint(pBall.x, pBall.y);
 
-//        sprite1Velocity = getRandomVelocity();
-//        sprite2Velocity = new Point(1,1);
         ballVelocity = new Point(5,5);
 
-//        sprite1MaxX = findViewById(R.id.the_canvas).getWidth() - ((GameBoard)findViewById(R.id.the_canvas)).getSprite1Width();
-//        sprite1MaxY = findViewById(R.id.the_canvas).getHeight() - ((GameBoard)findViewById(R.id.the_canvas)).getSprite1Height();
-//        sprite2MaxX = findViewById(R.id.the_canvas).getWidth() - ((GameBoard)findViewById(R.id.the_canvas)).getSprite2Width();
-//        sprite2MaxY = findViewById(R.id.the_canvas).getHeight() - ((GameBoard)findViewById(R.id.the_canvas)).getSprite2Height();
-        ballMaxX = findViewById(R.id.the_canvas).getWidth() - ((GameBoard)findViewById(R.id.the_canvas)).getBallWidth();
-        ballMaxY = findViewById(R.id.the_canvas).getHeight() - ((GameBoard)findViewById(R.id.the_canvas)).getBallHeight();
+        ballMaxX = findViewById(R.id.the_canvas).getWidth() - ((GameBoard)findViewById(R.id.the_canvas)).b.getWidth();
+        ballMaxY = findViewById(R.id.the_canvas).getHeight() - ((GameBoard)findViewById(R.id.the_canvas)).b.getHeight();
         frame.removeCallbacks(frameUpdate);
         ((GameBoard)findViewById(R.id.the_canvas)).invalidate(); // marks the canvas as outdated - so it will be updated on next frame
         frame.postDelayed(frameUpdate, FRAME_RATE);
@@ -166,42 +154,17 @@ public class GameActivity extends FullScreenActivity implements OnClickListener 
 
         @Override
         synchronized public void run() {
-//            if (((GameBoard)findViewById(R.id.the_canvas)).wasCollisionDetected()) {
-//                hasCollided = true;
-//                updateVelocity();
-////                Point collisionPoint = ((GameBoard)findViewById(R.id.the_canvas)).getLastCollision();
-//            }
+
             frame.removeCallbacks(frameUpdate);
 
             checkCollision();
-//
-//            //Add our call to increase or decrease velocity
+
+            //Add our call to increase or decrease velocity
             updateVelocity();
 
-//            Point sprite1 = new Point (((GameBoard)findViewById(R.id.the_canvas)).getSprite1X(),
-//                    ((GameBoard)findViewById(R.id.the_canvas)).getSprite1Y()) ;
-//            Point sprite2 = new Point (((GameBoard)findViewById(R.id.the_canvas)).getSprite2X(),
-//                    ((GameBoard)findViewById(R.id.the_canvas)).getSprite2Y());
-            Point ball = new Point (((GameBoard)findViewById(R.id.the_canvas)).getBallX(),
-                    ((GameBoard)findViewById(R.id.the_canvas)).getBallY());
-//
-//            // Check if points exceed the canvas
-//            sprite1.x = sprite1.x + sprite1Velocity.x;
-//            if (sprite1.x > sprite1MaxX || sprite1.x < 5) {
-//                sprite1Velocity.x *= -1;
-//            }
-//            sprite1.y = sprite1.y + sprite1Velocity.y;
-//            if (sprite1.y > sprite1MaxY || sprite1.y < 5) {
-//                sprite1Velocity.y *= -1;
-//            }
-//            sprite2.x = sprite2.x + sprite2Velocity.x;
-//            if (sprite2.x > sprite2MaxX || sprite2.x < 5) {
-//                sprite2Velocity.x *= -1;
-//            }
-//            sprite2.y = sprite2.y + sprite2Velocity.y;
-//            if (sprite2.y > sprite2MaxY || sprite2.y < 5) {
-//                sprite2Velocity.y *= -1;
-//            }
+            Point ball = new Point (((GameBoard)findViewById(R.id.the_canvas)).b.getPointX(),
+                    ((GameBoard)findViewById(R.id.the_canvas)).b.getPointY());
+
             ball.x = ball.x + ballVelocity.x;
             if (ball.x > ballMaxX || ball.x < 5) {
                 ballVelocity.x *= -1;
@@ -211,19 +174,7 @@ public class GameActivity extends FullScreenActivity implements OnClickListener 
                 ballVelocity.y *= -1;
             }
 
-//            ((GameBoard)findViewById(R.id.the_canvas)).TeamAGoalie.setPoint(TeamAGoalie.x, TeamAGoalie.y);
-//            ((GameBoard)findViewById(R.id.the_canvas)).TeamADefender1.setPoint(pTeamADefender1.x, pTeamADefender1.y);
-//            ((GameBoard)findViewById(R.id.the_canvas)).TeamADefender2.setPoint(pTeamADefender2.x, pTeamADefender2.y);
-//            ((GameBoard)findViewById(R.id.the_canvas)).TeamAAttacker1.setPoint(pTeamAAttacker1.x, pTeamAAttacker1.y);
-//            ((GameBoard)findViewById(R.id.the_canvas)).TeamAAttacker2.setPoint(pTeamAAttacker2.x, pTeamAAttacker2.y);
-//            ((GameBoard)findViewById(R.id.the_canvas)).TeamAAttacker3.setPoint(pTeamAAttacker3.x, pTeamAAttacker3.y);
-//            ((GameBoard)findViewById(R.id.the_canvas)).TeamBGoalie.setPoint(pTeamBGoalie.x, pTeamBGoalie.y);
-//            ((GameBoard)findViewById(R.id.the_canvas)).TeamBDefender1.setPoint(pTeamBDefender1.x, pTeamBDefender1.y);
-//            ((GameBoard)findViewById(R.id.the_canvas)).TeamBDefender2.setPoint(pTeamBDefender2.x, pTeamBDefender2.y);
-//            ((GameBoard)findViewById(R.id.the_canvas)).TeamBAttacker1.setPoint(pTeamBAttacker1.x, pTeamBAttacker1.y);
-//            ((GameBoard)findViewById(R.id.the_canvas)).TeamBAttacker2.setPoint(pTeamBAttacker2.x, pTeamBAttacker2.y);
-//            ((GameBoard)findViewById(R.id.the_canvas)).TeamBAttacker3.setPoint(pTeamBAttacker3.x, pTeamBAttacker3.y);
-            ((GameBoard)findViewById(R.id.the_canvas)).setBall(ball.x, ball.y);
+            ((GameBoard)findViewById(R.id.the_canvas)).b.setPoint(ball.x, ball.y);
             ((GameBoard)findViewById(R.id.the_canvas)).invalidate();
             frame.postDelayed(frameUpdate, FRAME_RATE);
         }
