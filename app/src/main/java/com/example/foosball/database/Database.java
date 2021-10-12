@@ -6,8 +6,10 @@ import com.example.foosball.MainActivity;
 import com.example.foosball.Utils;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -108,18 +110,46 @@ public class Database {
         });
     }
 
+    public static void updateBallCoords(String gameCode, int x, int y) {
+        final DatabaseReference ref = getGameReference(gameCode);
+        final ArrayList<Integer> coords = new ArrayList<>();
+        coords.add(x);
+        coords.add(y);
+        ref.child("ballCoords").setValue(coords);
+    }
+
+    public static void getBallCoords(String gameCode,
+                                     OnGetBallCoordsOperation onGetBallCoordsOperation) {
+        final DatabaseReference ref = getGameReference(gameCode);
+        ValueEventListener postListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                int[] coord = (int[]) dataSnapshot.getValue();
+                assert coord != null;
+                onGetBallCoordsOperation.onSuccess(coord[0], coord[1]);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Getting Post failed, log a message
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+            }
+        };
+        ref.child("ballCoords").addValueEventListener(postListener);
+    }
+
     private static DatabaseReference getGameReference(String gameCode) {
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         return database.getReference(DATABASE_PATH).child(gameCode);
     }
 
     public static void getPlayerNames(String gameCode,
-                                           OnGetPlayerNamesOperation onGetPlayerNamesOperation) {
+                                      OnGetPlayerNamesOperation onGetPlayerNamesOperation) {
         final DatabaseReference ref = getGameReference(gameCode);
         ArrayList<String> playerNames = new ArrayList<String>();
 
         handleFailure(ref.get(), onGetPlayerNamesOperation).addOnSuccessListener(res -> {
-            for (int playerId: PLAYER_IDS) {
+            for (int playerId : PLAYER_IDS) {
                 final String playerKey = getPlayerKey(playerId);
                 if (res.child(playerKey).exists()) {
                     playerNames.add((String) res.child(playerKey).getValue());

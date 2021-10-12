@@ -14,7 +14,7 @@ import java.util.ArrayList;
 public class LobbyActivity extends FullScreenActivity {
 
 
-    private ArrayList<TextView> getPlayerTextViews(){
+    private ArrayList<TextView> getPlayerTextViews() {
 
         ArrayList<TextView> playerTextViews = new ArrayList<TextView>();
         playerTextViews.add(findViewById(R.id.player1Text));
@@ -45,7 +45,7 @@ public class LobbyActivity extends FullScreenActivity {
                 for (String playerName : playerNames) {
                     TextView playerTextView = playerTextViews.get(i);
                     playerTextView.setText(playerName);
-                    i ++;
+                    i++;
                 }
             }
 
@@ -73,5 +73,11 @@ public class LobbyActivity extends FullScreenActivity {
                     }
                 })
         );
+
+        final Button startGame = findViewById(R.id.startGame);
+        startGame.setOnClickListener(view -> {
+            final Intent intent = new Intent(getApplicationContext(), GameActivity.class);
+            startActivity(intent);
+        });
     }
 }
