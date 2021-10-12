@@ -62,3 +62,7 @@ TODO:
 TODO:
 1. Continue Refactoring Ball class
 2. Refactor GameActivity to use Ball class
+
+## 12 October 2021
+### Add functionality to pull player names from db to update playerTextViews in Lobby Activity
+*Update by: Tristan*

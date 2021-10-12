@@ -9,6 +9,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.ArrayList;
+
 public class Database {
     private static final String TAG = "Database";
     private static final int[] PLAYER_IDS = {1, 2, 3, 4};
@@ -109,6 +111,24 @@ public class Database {
     private static DatabaseReference getGameReference(String gameCode) {
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         return database.getReference(DATABASE_PATH).child(gameCode);
+    }
+
+    public static void getPlayerNames(String gameCode,
+                                           OnGetPlayerNamesOperation onGetPlayerNamesOperation) {
+        final DatabaseReference ref = getGameReference(gameCode);
+        ArrayList<String> playerNames = new ArrayList<String>();
+
+        handleFailure(ref.get(), onGetPlayerNamesOperation).addOnSuccessListener(res -> {
+            for (int playerId: PLAYER_IDS) {
+                final String playerKey = getPlayerKey(playerId);
+                if (res.child(playerKey).exists()) {
+                    playerNames.add((String) res.child(playerKey).getValue());
+                }
+            }
+
+            onGetPlayerNamesOperation.onSuccess(playerNames);
+
+        });
     }
 
     private static Task<DataSnapshot> handleFailure(Task<DataSnapshot> task,
