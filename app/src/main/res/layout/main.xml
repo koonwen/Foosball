@@ -1,7 +1,8 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/LinearLayout01"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
     <com.example.foosball.drawing.GameBoard
         android:layout_width="fill_parent"
@@ -9,4 +10,26 @@
         android:layout_margin="20dip"
         android:id="@+id/the_canvas"/>
 
-</LinearLayout>
+    <ImageButton
+        android:id="@+id/up_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_above="@id/down_button"
+        android:layout_alignRight="@id/down_button"
+        android:background="@drawable/arrowup"
+        android:clickable="true" />
+
+    <ImageButton
+        android:id="@+id/down_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/arrowdown" />
+
+</RelativeLayout>

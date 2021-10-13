@@ -35,8 +35,7 @@ public class GameBoard extends View{
     private Map<String, Foosman> foosmanMap = new TreeMap<String, Foosman>();
     public Ball b;
     private boolean collisionDetected;
-
-    synchronized  public Foosman getFoosman(String name) {
+    synchronized public Foosman getFoosman(String name) {
         return foosmanMap.get(name);
     }
 
@@ -74,43 +73,8 @@ public class GameBoard extends View{
             int y = r.nextInt(maxY-5+1)+5;
             starField.add(new Point (x,y));
         }
-        collisionDetected = false;
     }
 
-    private boolean checkForCollision() {
-
-        // Create bounds for each foosman and the ball
-        List<Rect> foosmanboundsList = new ArrayList<Rect>();
-
-        for (Map.Entry<String, Foosman> entry : foosmanMap.entrySet()) {
-            Foosman foosman = entry.getValue();
-            int bmWidth = bmTeamA.getWidth(); // Note: Team A and B bm should have the same w & h
-            int bmHeight = bmTeamB.getWidth();
-            int foosmanPointX = foosman.getPointX();
-            int foosmanPointY = foosman.getPointY();
-            Rect r = new Rect(foosmanPointX, foosmanPointY, foosmanPointX + bmWidth, foosmanPointY + bmHeight);
-            foosmanboundsList.add(r);
-        }
-
-        Rect rball = new Rect(b.getPointX(), b.getPointY(), b.getPointX() + b.getWidth(), b.getPointY() + b.getHeight());
-
-        for (Rect r : foosmanboundsList) {
-            Rect r3 = rball;
-            if (rball.intersect(r)) {
-                for (int i = rball.left; i<rball.right; i++) {
-                    for (int j = rball.top; j<rball.bottom; j++) {
-                        if (bmBall.getPixel(i-r3.left, j-r3.top) != Color.TRANSPARENT) {
-                            if (bmTeamA.getPixel(i-r.left, j-r.top)!= Color.TRANSPARENT || bmTeamB.getPixel(i-r.left, j-r.top)!= Color.TRANSPARENT) {
-                                return true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        b.setLastCollision(new Point(-1,-1));
-        return false;
-    }
 
     @Override
     synchronized public void onDraw(Canvas canvas) {
@@ -154,7 +118,7 @@ public class GameBoard extends View{
 
 
         // Draw Points of Collision Detected
-        b.setCollisionDetected(checkForCollision());
+//        b.setCollisionDetected(checkForCollision());
 //        if (collisionDetected ) {
 //            p.setColor(Color.RED);
 //            p.setAlpha(255);
