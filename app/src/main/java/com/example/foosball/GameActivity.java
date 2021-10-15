@@ -304,6 +304,7 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
                 if (ball.y > ballMaxY || ball.y < 5) {
                     ballVelocity.y *= -1;
                 }
+                Database.updateBallCoords(gameCode, ball.x, ball.y);
                 ((GameBoard) findViewById(R.id.the_canvas)).b.setPoint(ball.x, ball.y);
             } else {
                 ((GameBoard) findViewById(R.id.the_canvas)).b.setPoint(ballX, ballY);
