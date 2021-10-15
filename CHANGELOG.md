@@ -66,3 +66,8 @@ TODO:
 ## 12 October 2021
 ### Add functionality to pull player names from db to update playerTextViews in Lobby Activity
 *Update by: Tristan*
+
+### 12 October 2021
+*Update by Koon*
+1. Modularize Ball class
+2. Create interface for BoardItems
