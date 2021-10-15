@@ -163,6 +163,32 @@ public class Database {
         });
     }
 
+    public static void startPlayerNamesListener(String gameCode,
+                                                OnGetPlayerNamesOperation onGetPlayerNamesOperation) {
+        final DatabaseReference ref = getGameReference(gameCode);
+        ValueEventListener postListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                ArrayList<String> playerNames = new ArrayList<>();
+                for (int playerId : PLAYER_IDS) {
+                    final String playerKey = getPlayerKey(playerId);
+                    if (dataSnapshot.child(playerKey).exists()) {
+                        playerNames.add((String) dataSnapshot.child(playerKey).getValue());
+                    }
+                }
+
+                onGetPlayerNamesOperation.onSuccess(playerNames);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Getting Post failed, log a message
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+            }
+        };
+        ref.addValueEventListener(postListener);
+    }
+
     private static Task<DataSnapshot> handleFailure(Task<DataSnapshot> task,
                                                     OnDatabaseOperation onDatabaseOperation) {
         return task.addOnFailureListener(e -> {

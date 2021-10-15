@@ -55,6 +55,25 @@ public class LobbyActivity extends FullScreenActivity {
             }
         });
 
+        Database.startPlayerNamesListener(gameCode, new OnGetPlayerNamesOperation() {
+            @Override
+            public void onSuccess(ArrayList<String> playerNames) {
+                ArrayList<TextView> playerTextViews = getPlayerTextViews();
+
+                int i = 0;
+                for (String playerName : playerNames) {
+                    TextView playerTextView = playerTextViews.get(i);
+                    playerTextView.setText(playerName);
+                    i++;
+                }
+            }
+
+            @Override
+            public void onConnectionError() {
+
+            }
+        });
+
 
         final int playerId = Utils.getPlayerId(getApplicationContext());
 
