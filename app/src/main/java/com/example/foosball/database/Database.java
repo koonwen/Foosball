@@ -2,6 +2,8 @@ package com.example.foosball.database;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.example.foosball.MainActivity;
 import com.example.foosball.Utils;
 import com.google.android.gms.tasks.Task;
@@ -145,26 +147,8 @@ public class Database {
         return database.getReference(DATABASE_PATH).child(gameCode);
     }
 
-    public static void getPlayerNames(String gameCode,
-                                      OnGetPlayerNamesOperation onGetPlayerNamesOperation) {
-        final DatabaseReference ref = getGameReference(gameCode);
-        ArrayList<String> playerNames = new ArrayList<String>();
-
-        handleFailure(ref.get(), onGetPlayerNamesOperation).addOnSuccessListener(res -> {
-            for (int playerId : PLAYER_IDS) {
-                final String playerKey = getPlayerKey(playerId);
-                if (res.child(playerKey).exists()) {
-                    playerNames.add((String) res.child(playerKey).getValue());
-                }
-            }
-
-            onGetPlayerNamesOperation.onSuccess(playerNames);
-
-        });
-    }
-
-    public static void startPlayerNamesListener(String gameCode,
-                                                OnGetPlayerNamesOperation onGetPlayerNamesOperation) {
+    public static void startGameStatusListener(String gameCode,
+                                                OnGetGameStatusOperation onGetGameStatusOperation) {
         final DatabaseReference ref = getGameReference(gameCode);
         ValueEventListener postListener = new ValueEventListener() {
             @Override
@@ -177,7 +161,12 @@ public class Database {
                     }
                 }
 
-                onGetPlayerNamesOperation.onSuccess(playerNames);
+                Boolean gameStarted = (Boolean) dataSnapshot.child("hasGameStarted").getValue();
+                Boolean gameEnded = (Boolean) dataSnapshot.child("hasGameEnded").getValue();
+                Boolean evenPlayers = playerNames.size() % 2 == 0;
+
+                onGetGameStatusOperation.onSuccess(playerNames,
+                        evenPlayers, gameStarted, gameEnded);
             }
 
             @Override

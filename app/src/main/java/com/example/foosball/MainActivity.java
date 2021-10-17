@@ -43,6 +43,7 @@ public class MainActivity extends FullScreenActivity {
                 @Override
                 public void onSuccess(String gameCode) {
                     Utils.setPlayerId(getApplicationContext(), HOST_PLAYER_ID);
+                    Utils.setPlayerName(getApplicationContext(), playerName);
                     goToLobbyScreen(gameCode);
                 }
             });
@@ -85,6 +86,7 @@ public class MainActivity extends FullScreenActivity {
                 @Override
                 public void onSuccess(int playerId) {
                     Utils.setPlayerId(getApplicationContext(), playerId);
+                    Utils.setPlayerName(getApplicationContext(), playerName);
                     goToLobbyScreen(gameCode);
                 }
             });
