@@ -13,11 +13,9 @@ import com.example.foosball.database.OnGetGameStatusOperation;
 import java.util.ArrayList;
 
 public class LobbyActivity extends FullScreenActivity {
-
-
     private ArrayList<TextView> getPlayerTextViews() {
 
-        ArrayList<TextView> playerTextViews = new ArrayList<TextView>();
+        ArrayList<TextView> playerTextViews = new ArrayList<>();
         playerTextViews.add(findViewById(R.id.player1Text));
         playerTextViews.add(findViewById(R.id.player2Text));
         playerTextViews.add(findViewById(R.id.player3Text));
@@ -33,10 +31,11 @@ public class LobbyActivity extends FullScreenActivity {
 
         final Button startGameButton = findViewById(R.id.startGame);
         startGameButton.setVisibility(View.GONE);
-        final String currentPlayerName = Utils.getPlayerName(getApplicationContext());
 
         final String gameCode = Utils.getGameCode(getApplicationContext());
         final TextView gameCodeText = findViewById(R.id.codeID);
+        final String placeholderPlayerName =
+                getResources().getString(R.string.placeholder_player_name);
         gameCodeText.setText(gameCode);
 
         Database.startGameStatusListener(gameCode, new OnGetGameStatusOperation() {
@@ -45,25 +44,22 @@ public class LobbyActivity extends FullScreenActivity {
                                   Boolean gameStarted, Boolean gameEnded) {
                 ArrayList<TextView> playerTextViews = getPlayerTextViews();
 
-                int i = 0;
-                for (String playerName : playerNames) {
-                    TextView playerTextView = playerTextViews.get(i);
-                    playerTextView.setText(playerName);
-                    i++;
+                for (int i = 0; i < playerTextViews.size(); i++) {
+                    final TextView playerTextView = playerTextViews.get(i);
+                    final String playerName = playerNames.get(i);
+                    if (playerName == null) {
+                        playerTextView.setText(placeholderPlayerName);
+                    } else {
+                        playerTextView.setText(playerName);
+                    }
                 }
-
-                System.out.print(currentPlayerName);
-
-                final String player1Name = playerTextViews.get(0).toString();
 
                 // If there are 2 or 4 players and host, then make start button visible
-                if (currentPlayerName == player1Name) {
+                if (Utils.isGameHost(getApplicationContext()) && evenPlayers && !gameStarted && !gameEnded) {
                     startGameButton.setVisibility(View.VISIBLE);
-                } else if (evenPlayers && gameStarted && !gameEnded) {
-                    startGameButton.setVisibility(View.VISIBLE);
+                } else {
+                    startGameButton.setVisibility(View.GONE);
                 }
-
-
             }
 
             @Override

@@ -4,7 +4,6 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.foosball.MainActivity;
 import com.example.foosball.Utils;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
@@ -57,7 +56,7 @@ public class Database {
 
     private static void setUpNewGame(String playerName, OnCreateGameOperation onCreateGameOperation,
                                      DatabaseReference ref, String gameCode) {
-        ref.child(getPlayerKey(MainActivity.HOST_PLAYER_ID)).setValue(playerName);
+        ref.child(getPlayerKey(Utils.HOST_PLAYER_ID)).setValue(playerName);
         ref.child(KEY_HAS_GAME_STARTED).setValue(false);
         ref.child(KEY_HAS_GAME_ENDED).setValue(false);
         onCreateGameOperation.onSuccess(gameCode);
@@ -148,22 +147,26 @@ public class Database {
     }
 
     public static void startGameStatusListener(String gameCode,
-                                                OnGetGameStatusOperation onGetGameStatusOperation) {
+                                               OnGetGameStatusOperation onGetGameStatusOperation) {
         final DatabaseReference ref = getGameReference(gameCode);
         ValueEventListener postListener = new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 ArrayList<String> playerNames = new ArrayList<>();
+                int numPlayers = 0;
                 for (int playerId : PLAYER_IDS) {
                     final String playerKey = getPlayerKey(playerId);
                     if (dataSnapshot.child(playerKey).exists()) {
                         playerNames.add((String) dataSnapshot.child(playerKey).getValue());
+                        numPlayers++;
+                    } else {
+                        playerNames.add(null);
                     }
                 }
 
-                Boolean gameStarted = (Boolean) dataSnapshot.child("hasGameStarted").getValue();
-                Boolean gameEnded = (Boolean) dataSnapshot.child("hasGameEnded").getValue();
-                Boolean evenPlayers = playerNames.size() % 2 == 0;
+                Boolean gameStarted = (Boolean) dataSnapshot.child(KEY_HAS_GAME_STARTED).getValue();
+                Boolean gameEnded = (Boolean) dataSnapshot.child(KEY_HAS_GAME_ENDED).getValue();
+                Boolean evenPlayers = numPlayers % 2 == 0;
 
                 onGetGameStatusOperation.onSuccess(playerNames,
                         evenPlayers, gameStarted, gameEnded);
@@ -171,8 +174,7 @@ public class Database {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                // Getting Post failed, log a message
-                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+                Log.w(TAG, "onCancelled", databaseError.toException());
             }
         };
         ref.addValueEventListener(postListener);

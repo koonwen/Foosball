@@ -13,7 +13,6 @@ import com.example.foosball.database.OnJoinGameOperation;
 import com.google.android.material.snackbar.Snackbar;
 
 public class MainActivity extends FullScreenActivity {
-    public static final int HOST_PLAYER_ID = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,8 +41,7 @@ public class MainActivity extends FullScreenActivity {
 
                 @Override
                 public void onSuccess(String gameCode) {
-                    Utils.setPlayerId(getApplicationContext(), HOST_PLAYER_ID);
-                    Utils.setPlayerName(getApplicationContext(), playerName);
+                    Utils.setPlayerId(getApplicationContext(), Utils.HOST_PLAYER_ID);
                     goToLobbyScreen(gameCode);
                 }
             });
@@ -86,7 +84,6 @@ public class MainActivity extends FullScreenActivity {
                 @Override
                 public void onSuccess(int playerId) {
                     Utils.setPlayerId(getApplicationContext(), playerId);
-                    Utils.setPlayerName(getApplicationContext(), playerName);
                     goToLobbyScreen(gameCode);
                 }
             });
