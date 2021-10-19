@@ -2,21 +2,20 @@ package com.example.foosball;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.foosball.database.Database;
 import com.example.foosball.database.OnBasicDatabaseOperation;
-import com.example.foosball.database.OnGetPlayerNamesOperation;
+import com.example.foosball.database.OnGetGameStatusOperation;
 
 import java.util.ArrayList;
 
 public class LobbyActivity extends FullScreenActivity {
-
-
     private ArrayList<TextView> getPlayerTextViews() {
 
-        ArrayList<TextView> playerTextViews = new ArrayList<TextView>();
+        ArrayList<TextView> playerTextViews = new ArrayList<>();
         playerTextViews.add(findViewById(R.id.player1Text));
         playerTextViews.add(findViewById(R.id.player2Text));
         playerTextViews.add(findViewById(R.id.player3Text));
@@ -30,41 +29,36 @@ public class LobbyActivity extends FullScreenActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lobby);
 
+        final Button startGameButton = findViewById(R.id.startGame);
+        startGameButton.setVisibility(View.GONE);
+
         final String gameCode = Utils.getGameCode(getApplicationContext());
         final TextView gameCodeText = findViewById(R.id.codeID);
+        final String placeholderPlayerName =
+                getResources().getString(R.string.placeholder_player_name);
         gameCodeText.setText(gameCode);
 
-        // Pull names from db, and populate names in lobby
-        Database.getPlayerNames(gameCode, new OnGetPlayerNamesOperation() {
+        Database.startGameStatusListener(gameCode, new OnGetGameStatusOperation() {
             @Override
-            public void onSuccess(ArrayList<String> playerNames) {
-
+            public void onSuccess(ArrayList<String> playerNames, Boolean evenPlayers,
+                                  Boolean gameStarted, Boolean gameEnded) {
                 ArrayList<TextView> playerTextViews = getPlayerTextViews();
 
-                int i = 0;
-                for (String playerName : playerNames) {
-                    TextView playerTextView = playerTextViews.get(i);
-                    playerTextView.setText(playerName);
-                    i++;
+                for (int i = 0; i < playerTextViews.size(); i++) {
+                    final TextView playerTextView = playerTextViews.get(i);
+                    final String playerName = playerNames.get(i);
+                    if (playerName == null) {
+                        playerTextView.setText(placeholderPlayerName);
+                    } else {
+                        playerTextView.setText(playerName);
+                    }
                 }
-            }
 
-            @Override
-            public void onConnectionError() {
-                //TODO: Decide appropriate error when pulling player names fail
-            }
-        });
-
-        Database.startPlayerNamesListener(gameCode, new OnGetPlayerNamesOperation() {
-            @Override
-            public void onSuccess(ArrayList<String> playerNames) {
-                ArrayList<TextView> playerTextViews = getPlayerTextViews();
-
-                int i = 0;
-                for (String playerName : playerNames) {
-                    TextView playerTextView = playerTextViews.get(i);
-                    playerTextView.setText(playerName);
-                    i++;
+                // If there are 2 or 4 players and host, then make start button visible
+                if (Utils.isGameHost(getApplicationContext()) && evenPlayers && !gameStarted && !gameEnded) {
+                    startGameButton.setVisibility(View.VISIBLE);
+                } else {
+                    startGameButton.setVisibility(View.GONE);
                 }
             }
 
@@ -93,10 +87,10 @@ public class LobbyActivity extends FullScreenActivity {
                 })
         );
 
-        final Button startGame = findViewById(R.id.startGame);
-        startGame.setOnClickListener(view -> {
+        startGameButton.setOnClickListener(view -> {
             final Intent intent = new Intent(getApplicationContext(), GameActivity.class);
             startActivity(intent);
         });
+
     }
 }

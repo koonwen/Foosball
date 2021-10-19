@@ -2,7 +2,8 @@ package com.example.foosball.database;
 
 import android.util.Log;
 
-import com.example.foosball.MainActivity;
+import androidx.annotation.NonNull;
+
 import com.example.foosball.Utils;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
@@ -55,7 +56,7 @@ public class Database {
 
     private static void setUpNewGame(String playerName, OnCreateGameOperation onCreateGameOperation,
                                      DatabaseReference ref, String gameCode) {
-        ref.child(getPlayerKey(MainActivity.HOST_PLAYER_ID)).setValue(playerName);
+        ref.child(getPlayerKey(Utils.HOST_PLAYER_ID)).setValue(playerName);
         ref.child(KEY_HAS_GAME_STARTED).setValue(false);
         ref.child(KEY_HAS_GAME_ENDED).setValue(false);
         onCreateGameOperation.onSuccess(gameCode);
@@ -145,45 +146,35 @@ public class Database {
         return database.getReference(DATABASE_PATH).child(gameCode);
     }
 
-    public static void getPlayerNames(String gameCode,
-                                      OnGetPlayerNamesOperation onGetPlayerNamesOperation) {
-        final DatabaseReference ref = getGameReference(gameCode);
-        ArrayList<String> playerNames = new ArrayList<String>();
-
-        handleFailure(ref.get(), onGetPlayerNamesOperation).addOnSuccessListener(res -> {
-            for (int playerId : PLAYER_IDS) {
-                final String playerKey = getPlayerKey(playerId);
-                if (res.child(playerKey).exists()) {
-                    playerNames.add((String) res.child(playerKey).getValue());
-                }
-            }
-
-            onGetPlayerNamesOperation.onSuccess(playerNames);
-
-        });
-    }
-
-    public static void startPlayerNamesListener(String gameCode,
-                                                OnGetPlayerNamesOperation onGetPlayerNamesOperation) {
+    public static void startGameStatusListener(String gameCode,
+                                               OnGetGameStatusOperation onGetGameStatusOperation) {
         final DatabaseReference ref = getGameReference(gameCode);
         ValueEventListener postListener = new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 ArrayList<String> playerNames = new ArrayList<>();
+                int numPlayers = 0;
                 for (int playerId : PLAYER_IDS) {
                     final String playerKey = getPlayerKey(playerId);
                     if (dataSnapshot.child(playerKey).exists()) {
                         playerNames.add((String) dataSnapshot.child(playerKey).getValue());
+                        numPlayers++;
+                    } else {
+                        playerNames.add(null);
                     }
                 }
 
-                onGetPlayerNamesOperation.onSuccess(playerNames);
+                Boolean gameStarted = (Boolean) dataSnapshot.child(KEY_HAS_GAME_STARTED).getValue();
+                Boolean gameEnded = (Boolean) dataSnapshot.child(KEY_HAS_GAME_ENDED).getValue();
+                Boolean evenPlayers = numPlayers % 2 == 0;
+
+                onGetGameStatusOperation.onSuccess(playerNames,
+                        evenPlayers, gameStarted, gameEnded);
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                // Getting Post failed, log a message
-                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+                Log.w(TAG, "onCancelled", databaseError.toException());
             }
         };
         ref.addValueEventListener(postListener);

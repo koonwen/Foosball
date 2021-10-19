@@ -9,6 +9,7 @@ public class Utils {
     private static final String PREFERENCE_PLAYER_ID = "playerId";
     private static final String PREFERENCE_GAME_CODE = "gameCode";
     public static final int NUM_CHARS_GAME_CODE = 6;
+    public static final int HOST_PLAYER_ID = 1;
 
     public static void setPlayerName(Context context, String playerName) {
         final SharedPreferences preferences =
@@ -35,7 +36,11 @@ public class Utils {
     public static int getPlayerId(Context context) {
         final SharedPreferences preferences =
                 PreferenceManager.getDefaultSharedPreferences(context);
-        return preferences.getInt(PREFERENCE_PLAYER_ID, 0);
+        return preferences.getInt(PREFERENCE_PLAYER_ID, 1);
+    }
+
+    public static boolean isGameHost(Context context) {
+        return getPlayerId(context) == HOST_PLAYER_ID;
     }
 
     public static void setGameCode(Context context, String gameCode) {
