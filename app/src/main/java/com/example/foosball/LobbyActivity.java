@@ -14,7 +14,7 @@ import java.util.ArrayList;
 public class LobbyActivity extends FullScreenActivity {
 
 
-    private ArrayList<TextView> getPlayerTextViews(){
+    private ArrayList<TextView> getPlayerTextViews() {
 
         ArrayList<TextView> playerTextViews = new ArrayList<TextView>();
         playerTextViews.add(findViewById(R.id.player1Text));
@@ -45,13 +45,32 @@ public class LobbyActivity extends FullScreenActivity {
                 for (String playerName : playerNames) {
                     TextView playerTextView = playerTextViews.get(i);
                     playerTextView.setText(playerName);
-                    i ++;
+                    i++;
                 }
             }
 
             @Override
             public void onConnectionError() {
                 //TODO: Decide appropriate error when pulling player names fail
+            }
+        });
+
+        Database.startPlayerNamesListener(gameCode, new OnGetPlayerNamesOperation() {
+            @Override
+            public void onSuccess(ArrayList<String> playerNames) {
+                ArrayList<TextView> playerTextViews = getPlayerTextViews();
+
+                int i = 0;
+                for (String playerName : playerNames) {
+                    TextView playerTextView = playerTextViews.get(i);
+                    playerTextView.setText(playerName);
+                    i++;
+                }
+            }
+
+            @Override
+            public void onConnectionError() {
+
             }
         });
 
@@ -73,5 +92,11 @@ public class LobbyActivity extends FullScreenActivity {
                     }
                 })
         );
+
+        final Button startGame = findViewById(R.id.startGame);
+        startGame.setOnClickListener(view -> {
+            final Intent intent = new Intent(getApplicationContext(), GameActivity.class);
+            startActivity(intent);
+        });
     }
 }
