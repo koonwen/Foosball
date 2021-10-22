@@ -23,12 +23,19 @@ public class Database {
     private static final String KEY_FORMAT_PLAYER = "player%1$s";
 
     // TODO: Figure out Firebase Database rules (currently there is no authentication)
-    public static void createGame(String playerName, OnCreateGameOperation onCreateGameOperation) {
+
+    /**
+     * Creates a new game in the database and generates the corresponding game code.
+     *
+     * @param playerName Name of the player that is creating a new game.
+     * @param createGameListener The listener to be called upon successful/failed game creation.
+     */
+    public static void createGame(String playerName, CreateGameListener createGameListener) {
         final String gameCode = Utils.generateGameCode();
 
         Log.d(TAG, "Creating game and storing in firebase realtime database");
         final DatabaseReference ref = getGameReference(gameCode);
-        handleFailure(ref.get(), onCreateGameOperation).addOnSuccessListener(res -> {
+        handleFailure(ref.get(), createGameListener).addOnSuccessListener(res -> {
             // Check if gameCode already exists in the database
             if (res.exists()) {
                 Log.d(TAG, "Game code " + gameCode + " already exists");
@@ -38,34 +45,34 @@ public class Database {
                 if ((hasGameEnded == null) || !(boolean) hasGameEnded) {
                     Log.d(TAG, "Game has not ended. Trying a new game code");
                     // If game has not ended, generate a new gameCode and restart
-                    createGame(playerName, onCreateGameOperation);
+                    createGame(playerName, createGameListener);
                     return;
                 }
                 Log.d(TAG, "Game has ended. Deleting and creating a new document");
                 // If game ended, then delete that document
                 // and create a new one with the same gameCode
                 ref.removeValue().addOnCompleteListener(removeTask ->
-                        setUpNewGame(playerName, onCreateGameOperation, ref, gameCode));
+                        setUpNewGame(playerName, createGameListener, ref, gameCode));
                 return;
             }
             // If gameCode does no exist, then use it
             Log.d(TAG, "Creating game with game code " + gameCode);
-            setUpNewGame(playerName, onCreateGameOperation, ref, gameCode);
+            setUpNewGame(playerName, createGameListener, ref, gameCode);
         });
     }
 
-    private static void setUpNewGame(String playerName, OnCreateGameOperation onCreateGameOperation,
+    private static void setUpNewGame(String playerName, CreateGameListener createGameListener,
                                      DatabaseReference ref, String gameCode) {
         ref.child(getPlayerKey(Utils.HOST_PLAYER_ID)).setValue(playerName);
         ref.child(KEY_HAS_GAME_STARTED).setValue(false);
         ref.child(KEY_HAS_GAME_ENDED).setValue(false);
-        onCreateGameOperation.onSuccess(gameCode);
+        createGameListener.onSuccess(gameCode);
     }
 
     public static void joinGame(String playerName, String gameCode,
-                                OnJoinGameOperation onJoinGameOperation) {
+                                JoinGameListener joinGameListener) {
         final DatabaseReference ref = getGameReference(gameCode);
-        handleFailure(ref.get(), onJoinGameOperation).addOnSuccessListener(res -> {
+        handleFailure(ref.get(), joinGameListener).addOnSuccessListener(res -> {
             // Checks if gamecode exists by accessing result from the task
             // Also check if game has neither started nor ended
             final Object hasGameStartedObj = res.child(KEY_HAS_GAME_STARTED).getValue();
@@ -79,12 +86,12 @@ public class Database {
 
             if (!gameExists || hasGameEnded) {
                 Log.d(TAG, "Game does not exist. Please check game code.");
-                onJoinGameOperation.onGameDoesNotExistError();
+                joinGameListener.onGameDoesNotExistError();
                 return;
             }
             if (hasGameStarted) {
                 Log.d(TAG, "Game has already started.");
-                onJoinGameOperation.onGameAlreadyStartedError();
+                joinGameListener.onGameAlreadyStartedError();
                 return;
             }
             // Checks whether keys of playernames exists, if not insert current player
@@ -93,21 +100,21 @@ public class Database {
                 final String playerKey = getPlayerKey(playerId);
                 if (!res.child(playerKey).exists()) {
                     ref.child(playerKey).setValue(playerName);
-                    onJoinGameOperation.onSuccess(playerId);
+                    joinGameListener.onSuccess(playerId);
                     return;
                 }
             }
             Log.d(TAG, "Lobby is full. Please try again later.");
-            onJoinGameOperation.onLobbyFullError();
+            joinGameListener.onLobbyFullError();
         });
     }
 
     public static void removePlayer(String gameCode, int playerId,
-                                    OnBasicDatabaseOperation onBasicDatabaseOperation) {
+                                    BasicDatabaseListener basicDatabaseListener) {
         final DatabaseReference ref = getGameReference(gameCode);
-        handleFailure(ref.get(), onBasicDatabaseOperation).addOnSuccessListener(res -> {
+        handleFailure(ref.get(), basicDatabaseListener).addOnSuccessListener(res -> {
             ref.child(getPlayerKey(playerId)).removeValue();
-            onBasicDatabaseOperation.onSuccess();
+            basicDatabaseListener.onSuccess();
         });
     }
 
@@ -120,7 +127,7 @@ public class Database {
     }
 
     public static void getBallCoords(String gameCode,
-                                     OnGetBallCoordsOperation onGetBallCoordsOperation) {
+                                     BallCoordsListener ballCoordsListener) {
         final DatabaseReference ref = getGameReference(gameCode);
         ValueEventListener postListener = new ValueEventListener() {
             @Override
@@ -129,7 +136,7 @@ public class Database {
                 assert coord != null;
                 final int x = ((Long) coord.get(0)).intValue();
                 final int y = ((Long) coord.get(1)).intValue();
-                onGetBallCoordsOperation.onSuccess(x, y);
+                ballCoordsListener.onSuccess(x, y);
             }
 
             @Override
@@ -147,7 +154,7 @@ public class Database {
     }
 
     public static void startGameStatusListener(String gameCode,
-                                               OnGetGameStatusOperation onGetGameStatusOperation) {
+                                               GameStatusListener gameStatusListener) {
         final DatabaseReference ref = getGameReference(gameCode);
         ValueEventListener postListener = new ValueEventListener() {
             @Override
@@ -168,7 +175,7 @@ public class Database {
                 Boolean gameEnded = (Boolean) dataSnapshot.child(KEY_HAS_GAME_ENDED).getValue();
                 Boolean evenPlayers = numPlayers % 2 == 0;
 
-                onGetGameStatusOperation.onSuccess(playerNames,
+                gameStatusListener.onSuccess(playerNames,
                         evenPlayers, gameStarted, gameEnded);
             }
 
@@ -181,10 +188,10 @@ public class Database {
     }
 
     private static Task<DataSnapshot> handleFailure(Task<DataSnapshot> task,
-                                                    OnDatabaseOperation onDatabaseOperation) {
+                                                    DatabaseListener databaseListener) {
         return task.addOnFailureListener(e -> {
             Log.e(TAG, "Error getting data", e);
-            onDatabaseOperation.onConnectionError();
+            databaseListener.onConnectionError();
         });
     }
 

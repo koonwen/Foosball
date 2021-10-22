@@ -7,9 +7,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.example.foosball.database.CreateGameListener;
 import com.example.foosball.database.Database;
-import com.example.foosball.database.OnCreateGameOperation;
-import com.example.foosball.database.OnJoinGameOperation;
+import com.example.foosball.database.JoinGameListener;
 import com.google.android.material.snackbar.Snackbar;
 
 public class MainActivity extends FullScreenActivity {
@@ -33,7 +33,7 @@ public class MainActivity extends FullScreenActivity {
             if (playerName == null) {
                 return;
             }
-            Database.createGame(playerName, new OnCreateGameOperation() {
+            Database.createGame(playerName, new CreateGameListener() {
                 @Override
                 public void onConnectionError() {
                     displayConnectionError();
@@ -58,7 +58,7 @@ public class MainActivity extends FullScreenActivity {
                 return;
             }
 
-            Database.joinGame(playerName, gameCode, new OnJoinGameOperation() {
+            Database.joinGame(playerName, gameCode, new JoinGameListener() {
                 @Override
                 public void onConnectionError() {
                     displayConnectionError();

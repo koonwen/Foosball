@@ -1,6 +1,6 @@
 package com.example.foosball.database;
 
-public interface OnJoinGameOperation extends OnDatabaseOperation {
+public interface JoinGameListener extends DatabaseListener {
     void onLobbyFullError();
 
     void onGameDoesNotExistError();

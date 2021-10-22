@@ -1,5 +1,5 @@
 package com.example.foosball.database;
 
-public interface OnGetBallCoordsOperation extends OnDatabaseOperation {
+public interface BallCoordsListener extends DatabaseListener {
     void onSuccess(int x, int y);
 }

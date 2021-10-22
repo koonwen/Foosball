@@ -6,9 +6,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.example.foosball.database.BasicDatabaseListener;
 import com.example.foosball.database.Database;
-import com.example.foosball.database.OnBasicDatabaseOperation;
-import com.example.foosball.database.OnGetGameStatusOperation;
+import com.example.foosball.database.GameStatusListener;
 
 import java.util.ArrayList;
 
@@ -38,7 +38,7 @@ public class LobbyActivity extends FullScreenActivity {
                 getResources().getString(R.string.placeholder_player_name);
         gameCodeText.setText(gameCode);
 
-        Database.startGameStatusListener(gameCode, new OnGetGameStatusOperation() {
+        Database.startGameStatusListener(gameCode, new GameStatusListener() {
             @Override
             public void onSuccess(ArrayList<String> playerNames, Boolean evenPlayers,
                                   Boolean gameStarted, Boolean gameEnded) {
@@ -73,7 +73,7 @@ public class LobbyActivity extends FullScreenActivity {
 
         final Button returnMenu = findViewById(R.id.returnMenu);
         returnMenu.setOnClickListener(view ->
-                Database.removePlayer(gameCode, playerId, new OnBasicDatabaseOperation() {
+                Database.removePlayer(gameCode, playerId, new BasicDatabaseListener() {
                     @Override
                     public void onSuccess() {
                         final Intent intent = new Intent(getApplicationContext(),

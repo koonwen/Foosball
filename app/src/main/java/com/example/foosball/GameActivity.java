@@ -12,8 +12,8 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.ImageButton;
 
+import com.example.foosball.database.BallCoordsListener;
 import com.example.foosball.database.Database;
-import com.example.foosball.database.OnGetBallCoordsOperation;
 import com.example.foosball.drawing.GameBoard;
 import com.example.foosball.models.Ball;
 import com.example.foosball.models.Foosman;
@@ -208,7 +208,7 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
         gameCode = Utils.getGameCode(getApplicationContext());
         playerId = Utils.getPlayerId(getApplicationContext());
         if (playerId != 1) {
-            Database.getBallCoords(gameCode, new OnGetBallCoordsOperation() {
+            Database.getBallCoords(gameCode, new BallCoordsListener() {
                 @Override
                 public void onSuccess(int x, int y) {
                     ballX = x;
