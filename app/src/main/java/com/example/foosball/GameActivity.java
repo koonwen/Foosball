@@ -23,6 +23,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * This acts as an Game Engine. It initiates the positions of all elements including the ball
+ * and foosmen and also handles the movement of the elements for every frame.
+ */
 
 public class GameActivity extends FullScreenActivity implements OnTouchListener {
 
@@ -31,8 +35,9 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
     private int ballMaxY;
     private int ballMaxX;
 
-    //acceleration flag
+    // acceleration flag
     private final boolean isAccelerating = false;
+
     private boolean hasCollided = false;
     private boolean collisionFromTopOrBottom = false;
     private boolean upButtonDown = false;
@@ -66,8 +71,11 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
     //        return true;
     //    }
 
-    //Increase the velocity towards five or decrease
-    //back to one depending on state
+    /**
+     * Increase the velocity towards seven or
+     * and hold steady afterwards
+     */
+
     private void updateVelocity() {
         int xDir = (ballVelocity.x > 0) ? 1 : -1;
         int yDir = (ballVelocity.y > 0) ? 1 : -1;
@@ -149,6 +157,12 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
         }
     }
 
+    /**
+     * This method is called when the user presses the 'Up' or 'Down' buttons on screen.
+     * It checks if `upButtonDown` or `downButtonDown` are true and then checks if the
+     * foosmen closest to the canvas top and bottom edges are within a distance of 50.
+     * If false, it specifies a new position for each foosmen by 5 in the Y-direction.
+     */
 
     private void moveFoosman() {
         int canvasHeight = findViewById(R.id.the_canvas).getHeight();
