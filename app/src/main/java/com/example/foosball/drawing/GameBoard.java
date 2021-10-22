@@ -22,6 +22,15 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.View;
 
+/**
+ * This is a Custom View Component. More information can be found here:
+ * https://developer.android.com/guide/topics/ui/custom-components
+ *
+ * It is extended from `res/layout/main.xml`.
+ *
+ * It renders the background (stars field), ball and foosmen objects.
+ */
+
 public class GameBoard extends View{
     private Paint p;
     private List<Point> starField = null;
@@ -117,7 +126,10 @@ public class GameBoard extends View{
         }
 
 
-        // Draw Points of Collision Detected
+        /**
+         * This draws points of collisions detected between the ball and the foosmen.
+         * It is for debugging purposes and should be removed in production.
+         */
 //        b.setCollisionDetected(checkForCollision());
 //        if (collisionDetected ) {
 //            p.setColor(Color.RED);
