@@ -325,7 +325,7 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
             ((GameBoard) findViewById(R.id.the_canvas)).b.setPoint(ball.x, ball.y);
 
             if (frameNumber == FPS / 2) {
-                if (!isGameHost) {
+                if (isGameHost) {
                     Database.updateBallCoords(gameCode, ball.x, ball.y, ballVelocity.x,
                             ballVelocity.y);
                 } else {

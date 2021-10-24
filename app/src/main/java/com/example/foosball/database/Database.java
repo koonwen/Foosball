@@ -113,7 +113,12 @@ public class Database {
                                        BasicDatabaseListener basicDatabaseListener) {
         final DatabaseReference ref = getGameReference(gameCode);
         handleFailure(ref.get(), basicDatabaseListener).addOnSuccessListener(res -> {
-           ref.child("hasGameStarted").setValue(true);
+            ref.child("hasGameStarted").setValue(true);
+            final DatabaseReference refBallCoords = getGameReference(gameCode).child("ballCoords");
+            refBallCoords.child("posX").setValue(0);
+            refBallCoords.child("posY").setValue(0);
+            refBallCoords.child("velocityX").setValue(0);
+            refBallCoords.child("velocityY").setValue(0);
         });
     }
 
