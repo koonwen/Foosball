@@ -46,9 +46,6 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
     private static final int FRAME_RATE = 1000 / FPS;
     private String gameCode;
     private boolean isGameHost;
-    private int ballX;
-    private int ballY;
-    private int frameNumber = 0;
     private final List<String> foosmanNames = Arrays.asList("TeamAGoalie", "TeamADefender1",
             "TeamADefender2", "TeamAAttacker1", "TeamAAttacker2", "TeamAAttacker3", "TeamBGoalie",
             "TeamBDefender1", "TeamBDefender2", "TeamBAttacker1", "TeamBAttacker2", "TeamBAttacker3");
@@ -227,8 +224,6 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
             Database.getBallCoords(gameCode, new BallCoordsListener() {
                 @Override
                 public void onSuccess(int x, int y, int vx, int vy) {
-                    ballX = x;
-                    ballY = y;
                     if (ballVelocity != null) {
                         ballVelocity.x = vx;
                         ballVelocity.y = vy;
@@ -326,18 +321,10 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
             }
             ((GameBoard) findViewById(R.id.the_canvas)).b.setPoint(ball.x, ball.y);
 
-            if (frameNumber == FPS / 2) {
-                if (isGameHost) {
-                    Database.updateBallCoords(gameCode, ball.x, ball.y, ballVelocity.x,
-                            ballVelocity.y);
-                } else {
-                    // ball.x = ballX;
-                    // ball.y = ballY;
-                }
-                frameNumber = 0;
+            if (isGameHost) {
+                Database.updateBallCoords(gameCode, ball.x, ball.y, ballVelocity.x,
+                        ballVelocity.y);
             }
-
-            frameNumber++;
 
             ((GameBoard) findViewById(R.id.the_canvas)).invalidate();
             frame.postDelayed(frameUpdate, FRAME_RATE);
