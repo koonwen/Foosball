@@ -21,6 +21,7 @@ public class Database {
     private static final String KEY_HAS_GAME_STARTED = "hasGameStarted";
     private static final String KEY_HAS_GAME_ENDED = "hasGameEnded";
     private static final String KEY_FORMAT_PLAYER = "player%1$s";
+    private static ValueEventListener gameStatusValueEventListener;
 
     // TODO: Figure out Firebase Database rules (currently there is no authentication)
 
@@ -63,16 +64,18 @@ public class Database {
 
     private static void setUpNewGame(String playerName, CreateGameListener createGameListener,
                                      DatabaseReference ref, String gameCode) {
-        ref.child(getPlayerKey(Utils.HOST_PLAYER_ID)).setValue(playerName);
-        ref.child(KEY_HAS_GAME_STARTED).setValue(false);
-        ref.child(KEY_HAS_GAME_ENDED).setValue(false);
+        final DatabaseReference refGameStatus = getReferenceGameStatus(ref);
+        refGameStatus.child(getPlayerKey(Utils.HOST_PLAYER_ID)).setValue(playerName);
+        refGameStatus.child(KEY_HAS_GAME_STARTED).setValue(false);
+        refGameStatus.child(KEY_HAS_GAME_ENDED).setValue(false);
         createGameListener.onSuccess(gameCode);
     }
 
     public static void joinGame(String playerName, String gameCode,
                                 JoinGameListener joinGameListener) {
         final DatabaseReference ref = getGameReference(gameCode);
-        handleFailure(ref.get(), joinGameListener).addOnSuccessListener(res -> {
+        final DatabaseReference refGameStatus = getReferenceGameStatus(ref);
+        handleFailure(refGameStatus.get(), joinGameListener).addOnSuccessListener(res -> {
             // Checks if gamecode exists by accessing result from the task
             // Also check if game has neither started nor ended
             final Object hasGameStartedObj = res.child(KEY_HAS_GAME_STARTED).getValue();
@@ -99,7 +102,7 @@ public class Database {
             for (int playerId : PLAYER_IDS) {
                 final String playerKey = getPlayerKey(playerId);
                 if (!res.child(playerKey).exists()) {
-                    ref.child(playerKey).setValue(playerName);
+                    refGameStatus.child(playerKey).setValue(playerName);
                     joinGameListener.onSuccess(playerId);
                     return;
                 }
@@ -112,8 +115,9 @@ public class Database {
     public static void updateStartGame(String gameCode,
                                        BasicDatabaseListener basicDatabaseListener) {
         final DatabaseReference ref = getGameReference(gameCode);
-        handleFailure(ref.get(), basicDatabaseListener).addOnSuccessListener(res -> {
-            ref.child("hasGameStarted").setValue(true);
+        final DatabaseReference refGameStatus = getReferenceGameStatus(ref);
+        handleFailure(refGameStatus.get(), basicDatabaseListener).addOnSuccessListener(res -> {
+            refGameStatus.child("hasGameStarted").setValue(true);
             final DatabaseReference refBallCoords = getGameReference(gameCode).child("ballCoords");
             refBallCoords.child("posX").setValue(0);
             refBallCoords.child("posY").setValue(0);
@@ -125,8 +129,9 @@ public class Database {
     public static void removePlayer(String gameCode, int playerId,
                                     BasicDatabaseListener basicDatabaseListener) {
         final DatabaseReference ref = getGameReference(gameCode);
-        handleFailure(ref.get(), basicDatabaseListener).addOnSuccessListener(res -> {
-            ref.child(getPlayerKey(playerId)).removeValue();
+        final DatabaseReference refGameStatus = getReferenceGameStatus(ref);
+        handleFailure(refGameStatus.get(), basicDatabaseListener).addOnSuccessListener(res -> {
+            refGameStatus.child(getPlayerKey(playerId)).removeValue();
             basicDatabaseListener.onSuccess();
         });
     }
@@ -174,6 +179,7 @@ public class Database {
     public static void startGameStatusListener(String gameCode,
                                                GameStatusListener gameStatusListener) {
         final DatabaseReference ref = getGameReference(gameCode);
+        final DatabaseReference refGameStatus = getReferenceGameStatus(ref);
         ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -202,7 +208,13 @@ public class Database {
                 Log.w(TAG, "onCancelled", databaseError.toException());
             }
         };
-        ref.addValueEventListener(postListener);
+        gameStatusValueEventListener = refGameStatus.addValueEventListener(postListener);
+    }
+
+    public static void stopGameStatusListener(String gameCode) {
+        final DatabaseReference ref = getGameReference(gameCode);
+        final DatabaseReference refGameStatus = getReferenceGameStatus(ref);
+        refGameStatus.removeEventListener(gameStatusValueEventListener);
     }
 
     private static Task<DataSnapshot> handleFailure(Task<DataSnapshot> task,
@@ -215,6 +227,10 @@ public class Database {
 
     private static String getPlayerKey(int playerId) {
         return String.format(KEY_FORMAT_PLAYER, playerId);
+    }
+
+    private static DatabaseReference getReferenceGameStatus(DatabaseReference ref) {
+        return ref.child("gameStatus");
     }
 }
 

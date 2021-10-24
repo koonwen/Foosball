@@ -9,6 +9,7 @@ import android.widget.TextView;
 import com.example.foosball.database.BasicDatabaseListener;
 import com.example.foosball.database.Database;
 import com.example.foosball.database.GameStatusListener;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -55,15 +56,18 @@ public class LobbyActivity extends FullScreenActivity {
                 }
 
                 // If there are 2 or 4 players and host, then make start button visible
-                if (Utils.isGameHost(getApplicationContext()) && evenPlayers && !gameStarted && !gameEnded) {
+                if (Utils.isGameHost(getApplicationContext()) && evenPlayers
+                        && !gameStarted && !gameEnded) {
                     startGameButton.setVisibility(View.VISIBLE);
                 } else {
                     startGameButton.setVisibility(View.GONE);
                 }
 
-                // Automatically start game for rest of the players once host has started game
-                if (!(Utils.isGameHost(getApplicationContext())) && gameStarted && !gameEnded) {
-                    final Intent intent = new Intent (getApplicationContext(), GameActivity.class);
+                // Automatically start game for rest of players once host has started game
+                if (!Utils.isGameHost(getApplicationContext()) && gameStarted && !gameEnded) {
+                    final Intent intent = new Intent(getApplicationContext(),
+                            GameActivity.class);
+                    Database.stopGameStatusListener(gameCode);
                     startActivity(intent);
                 }
             }
@@ -102,6 +106,7 @@ public class LobbyActivity extends FullScreenActivity {
                 public void onConnectionError() {
                 }
             });
+            Database.stopGameStatusListener(gameCode);
             final Intent intent = new Intent(getApplicationContext(), GameActivity.class);
             startActivity(intent);
         });
