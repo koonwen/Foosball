@@ -229,8 +229,10 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
                 public void onSuccess(int x, int y, int vx, int vy) {
                     ballX = x;
                     ballY = y;
-                    ballVelocity.x = vx;
-                    ballVelocity.y = vy;
+                    if (ballVelocity != null) {
+                        ballVelocity.x = vx;
+                        ballVelocity.y = vy;
+                    }
                     ((GameBoard) findViewById(R.id.the_canvas)).b.setPoint(x, y);
                 }
 
