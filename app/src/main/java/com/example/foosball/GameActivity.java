@@ -42,11 +42,13 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
     private boolean collisionFromTopOrBottom = false;
     private boolean upButtonDown = false;
     private boolean downButtonDown = false;
-    private static final int FRAME_RATE = 20; //50 frames per second
+    private static final int FPS = 50;
+    private static final int FRAME_RATE = 1000 / FPS;
     private String gameCode;
-    private int playerId;
+    private boolean isGameHost;
     private int ballX;
     private int ballY;
+    private int frameNumber = 0;
     private final List<String> foosmanNames = Arrays.asList("TeamAGoalie", "TeamADefender1",
             "TeamADefender2", "TeamAAttacker1", "TeamAAttacker2", "TeamAAttacker3", "TeamBGoalie",
             "TeamBDefender1", "TeamBDefender2", "TeamBAttacker1", "TeamBAttacker2", "TeamBAttacker3");
@@ -220,13 +222,16 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
             }
         }, 1000);
         gameCode = Utils.getGameCode(getApplicationContext());
-        playerId = Utils.getPlayerId(getApplicationContext());
-        if (playerId != 1) {
+        isGameHost = Utils.isGameHost(getApplicationContext());
+        if (!isGameHost) {
             Database.getBallCoords(gameCode, new BallCoordsListener() {
                 @Override
-                public void onSuccess(int x, int y) {
+                public void onSuccess(int x, int y, int vx, int vy) {
                     ballX = x;
                     ballY = y;
+                    ballVelocity.x = vx;
+                    ballVelocity.y = vy;
+                    ((GameBoard) findViewById(R.id.the_canvas)).b.setPoint(x, y);
                 }
 
                 @Override
@@ -301,28 +306,36 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
         synchronized public void run() {
             frame.removeCallbacks(frameUpdate);
 
-            if (playerId == 1) {
 
-                hasCollided = checkCollision(((GameBoard) findViewById(R.id.the_canvas)).b, foosmanList);
-                handleCollision();
-                moveFoosman();
-                updateVelocity();
+            hasCollided = checkCollision(((GameBoard) findViewById(R.id.the_canvas)).b, foosmanList);
+            handleCollision();
+            moveFoosman();
+            updateVelocity();
 
-                Point ball = new Point(((GameBoard) findViewById(R.id.the_canvas)).b.getPointX(),
-                        ((GameBoard) findViewById(R.id.the_canvas)).b.getPointY());
-                ball.x = ball.x + ballVelocity.x;
-                if (ball.x > ballMaxX || ball.x < 5) {
-                    ballVelocity.x *= -1;
-                }
-                ball.y = ball.y + ballVelocity.y;
-                if (ball.y > ballMaxY || ball.y < 5) {
-                    ballVelocity.y *= -1;
-                }
-                Database.updateBallCoords(gameCode, ball.x, ball.y);
-                ((GameBoard) findViewById(R.id.the_canvas)).b.setPoint(ball.x, ball.y);
-            } else {
-                ((GameBoard) findViewById(R.id.the_canvas)).b.setPoint(ballX, ballY);
+            Point ball = new Point(((GameBoard) findViewById(R.id.the_canvas)).b.getPointX(),
+                    ((GameBoard) findViewById(R.id.the_canvas)).b.getPointY());
+            ball.x = ball.x + ballVelocity.x;
+            if (ball.x > ballMaxX || ball.x < 5) {
+                ballVelocity.x *= -1;
             }
+            ball.y = ball.y + ballVelocity.y;
+            if (ball.y > ballMaxY || ball.y < 5) {
+                ballVelocity.y *= -1;
+            }
+            ((GameBoard) findViewById(R.id.the_canvas)).b.setPoint(ball.x, ball.y);
+
+            if (frameNumber == FPS / 2) {
+                if (!isGameHost) {
+                    Database.updateBallCoords(gameCode, ball.x, ball.y, ballVelocity.x,
+                            ballVelocity.y);
+                } else {
+                    // ball.x = ballX;
+                    // ball.y = ballY;
+                }
+                frameNumber = 0;
+            }
+
+            frameNumber++;
 
             ((GameBoard) findViewById(R.id.the_canvas)).invalidate();
             frame.postDelayed(frameUpdate, FRAME_RATE);

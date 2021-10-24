@@ -118,12 +118,12 @@ public class Database {
         });
     }
 
-    public static void updateBallCoords(String gameCode, int x, int y) {
-        final DatabaseReference ref = getGameReference(gameCode);
-        final ArrayList<Integer> coords = new ArrayList<>();
-        coords.add(x);
-        coords.add(y);
-        ref.child("ballCoords").setValue(coords);
+    public static void updateBallCoords(String gameCode, int x, int y, int vx, int vy) {
+        final DatabaseReference ref = getGameReference(gameCode).child("ballCoords");
+        ref.child("posX").setValue(x);
+        ref.child("posY").setValue(y);
+        ref.child("velocityX").setValue(vx);
+        ref.child("velocityY").setValue(vy);
     }
 
     public static void getBallCoords(String gameCode,
@@ -132,11 +132,16 @@ public class Database {
         ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                ArrayList<?> coord = (ArrayList<?>) dataSnapshot.getValue();
-                assert coord != null;
-                final int x = ((Long) coord.get(0)).intValue();
-                final int y = ((Long) coord.get(1)).intValue();
-                ballCoordsListener.onSuccess(x, y);
+                final Object xObj = dataSnapshot.child("posX").getValue();
+                final Object yObj = dataSnapshot.child("posY").getValue();
+                final Object vxObj = dataSnapshot.child("velocityX").getValue();
+                final Object vyObj = dataSnapshot.child("velocityY").getValue();
+                assert xObj != null && yObj != null && vxObj != null && vyObj != null;
+                final int x = ((Long) xObj).intValue();
+                final int y = ((Long) yObj).intValue();
+                final int vx = ((Long) vxObj).intValue();
+                final int vy = ((Long) vyObj).intValue();
+                ballCoordsListener.onSuccess(x, y, vx, vy);
             }
 
             @Override
