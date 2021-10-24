@@ -109,6 +109,14 @@ public class Database {
         });
     }
 
+    public static void updateStartGame(String gameCode,
+                                       BasicDatabaseListener basicDatabaseListener) {
+        final DatabaseReference ref = getGameReference(gameCode);
+        handleFailure(ref.get(), basicDatabaseListener).addOnSuccessListener(res -> {
+           ref.child("hasGameStarted").setValue(true);
+        });
+    }
+
     public static void removePlayer(String gameCode, int playerId,
                                     BasicDatabaseListener basicDatabaseListener) {
         final DatabaseReference ref = getGameReference(gameCode);
