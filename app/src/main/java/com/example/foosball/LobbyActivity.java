@@ -60,11 +60,16 @@ public class LobbyActivity extends FullScreenActivity {
                 } else {
                     startGameButton.setVisibility(View.GONE);
                 }
+
+                // Automatically start game for rest of the players once host has started game
+                if (!(Utils.isGameHost(getApplicationContext())) && gameStarted && !gameEnded) {
+                    final Intent intent = new Intent (getApplicationContext(), GameActivity.class);
+                    startActivity(intent);
+                }
             }
 
             @Override
             public void onConnectionError() {
-
             }
         });
 
@@ -88,6 +93,15 @@ public class LobbyActivity extends FullScreenActivity {
         );
 
         startGameButton.setOnClickListener(view -> {
+            Database.updateStartGame(gameCode, new BasicDatabaseListener() {
+                @Override
+                public void onSuccess() {
+                }
+
+                @Override
+                public void onConnectionError() {
+                }
+            });
             final Intent intent = new Intent(getApplicationContext(), GameActivity.class);
             startActivity(intent);
         });
