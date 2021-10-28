@@ -1,5 +1,8 @@
 package com.example.foosball.models;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -11,15 +14,27 @@ import android.graphics.Rect;
 public class Ball implements BoardItem {
 
     private Point point = new Point(-1, -1);
-    private Rect bounds;
     private int ballRotation = 0;
-
     private boolean collisionDetected = false;
     private Point lastCollision;
-    public Matrix mball = new Matrix();
+
+    private Rect bounds;
+    private Bitmap bm;
+
+    private Matrix mball = new Matrix();
+
+    public Ball(Bitmap bm) {
+        this.bm = bm;
+        this.bounds = new Rect(0, 0, bm.getWidth(), bm.getHeight());
+    }
+
+    public Matrix getMball() {
+        return mball;
+    }
 
     /**
      * Getter for ball rotation
+     *
      * @return ballRotation in degrees
      */
     public int getBallRotation() {
@@ -28,6 +43,7 @@ public class Ball implements BoardItem {
 
     /**
      * Setter for ball rotation
+     *
      * @param ballRotation
      */
     public void setBallRotation(int ballRotation) {
@@ -36,6 +52,7 @@ public class Ball implements BoardItem {
 
     /**
      * Setter for whether collision has been detected or not
+     *
      * @param collisionDetected
      */
     public void setCollisionDetected(boolean collisionDetected) {
@@ -44,6 +61,7 @@ public class Ball implements BoardItem {
 
     /**
      * Getter for collision status
+     *
      * @return boolean
      */
     public boolean isCollisionDetected() {
@@ -52,6 +70,7 @@ public class Ball implements BoardItem {
 
     /**
      * Getter for last Point where collision was detected
+     *
      * @return Point object
      */
     public Point getLastCollision() {
@@ -60,6 +79,7 @@ public class Ball implements BoardItem {
 
     /**
      * Setter for the most recent collision point
+     *
      * @param lastCollision
      */
     public void setLastCollision(Point lastCollision) {
@@ -68,6 +88,7 @@ public class Ball implements BoardItem {
 
     /**
      * Setter for ball position point
+     *
      * @param X
      * @param Y
      */
@@ -78,6 +99,7 @@ public class Ball implements BoardItem {
 
     /**
      * Getter for x-coordinate of the ball position
+     *
      * @return x-coordinate
      */
     @Override
@@ -87,6 +109,7 @@ public class Ball implements BoardItem {
 
     /**
      * Getter for the y-coordinate of the ball position
+     *
      * @return y-coordinate
      */
     @Override
@@ -96,26 +119,27 @@ public class Ball implements BoardItem {
 
     /**
      * Getter for the bounds of the ball object
+     *
      * @return bounds of the ball
      */
-    @Override
-    public Rect getBounds() {
-        return bounds;
-    }
-
-    /**
-     * Setter for the bounds of the ball object
-     * @param bounds
-     */
-    @Override
-    public void setBounds(Rect bounds) {
-        this.bounds = bounds;
-    }
-
-    /**
-     * Getter for the width of the ball object bounds
-     * @return ball object bound width
-     */
+//    @Override
+//    public Rect getBounds() {
+//        return bounds;
+//    }
+//
+//    /**
+//     * Setter for the bounds of the ball object
+//     * @param bounds
+//     */
+//    @Override
+//    public void setBounds(Rect bounds) {
+//        this.bounds = bounds;
+//    }
+//
+//    /**
+//     * Getter for the width of the ball object bounds
+//     * @return ball object bound width
+//     */
     @Override
     public int getWidth() {
         return bounds.width();
@@ -123,10 +147,21 @@ public class Ball implements BoardItem {
 
     /**
      * Getter for the height of the ball object bounds
+     *
      * @return ball object bound height
      */
     @Override
     public int getHeight() {
         return bounds.height();
+    }
+
+    public void refresh(Canvas canvas) {
+        if (point.x > 0) {
+            mball.reset();
+            mball.postTranslate((float) (point.x), (float) (point.y));
+            mball.postRotate(ballRotation, (float) (point.x + bounds.width() / 2.0), (float) (point.y + bounds.width() / 2.0));
+            ballRotation = (ballRotation + 5) % 360;
+        }
+        canvas.drawBitmap(bm, mball, null);
     }
 }

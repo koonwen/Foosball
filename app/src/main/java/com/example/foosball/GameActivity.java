@@ -15,8 +15,10 @@ import android.widget.ImageButton;
 import com.example.foosball.database.BallCoordsListener;
 import com.example.foosball.database.Database;
 import com.example.foosball.drawing.GameBoard;
+import com.example.foosball.models.Background;
 import com.example.foosball.models.Ball;
 import com.example.foosball.models.Foosman;
+import com.example.foosball.models.FoosmenTeam;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -162,30 +164,19 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
      * foosmen closest to the canvas top and bottom edges are within a distance of 50.
      * If false, it specifies a new position for each foosmen by 5 in the Y-direction.
      */
-
     private void moveFoosman() {
         int canvasHeight = findViewById(R.id.the_canvas).getHeight();
 
-        if (upButtonDown) {
-            for (int i = 0; i < foosmanNamesTeamA.size(); i++) {
-                Foosman foosman = foosmanList.get(i);
-                String name = foosmanNamesTeamA.get(i);
-                if (((GameBoard) findViewById(R.id.the_canvas)).getFoosman("TeamAAttacker3").getPointY() > 50) {
-                    foosman.setPoint(foosman.getPointX(), foosman.getPointY() - 5);
-                }
-            }
-        }
         if (downButtonDown) {
-            for (int i = 0; i < foosmanNamesTeamA.size(); i++) {
-                Foosman foosman = foosmanList.get(i);
-                String name = foosmanNamesTeamA.get(i);
-                if (((GameBoard) findViewById(R.id.the_canvas)).getFoosman("TeamAAttacker1").getPointY() < (canvasHeight - 150)) {
-                    foosman.setPoint(foosman.getPointX(), foosman.getPointY() + 5);
-                }
+            if (((GameBoard) findViewById(R.id.the_canvas)).getFoosman("TeamAAttacker1").getPointY() < (canvasHeight - 150)) {
+                ((GameBoard) findViewById(R.id.the_canvas)).teamA.movePlayers(5);
             }
         }
-
-
+        if (upButtonDown) {
+            if (((GameBoard) findViewById(R.id.the_canvas)).getFoosman("TeamAAttacker3").getPointY() > 50) {
+                ((GameBoard) findViewById(R.id.the_canvas)).teamA.movePlayers(-5);
+            }
+        }
     }
 
 
@@ -249,7 +240,7 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
     }
 
     synchronized public void initGfx() {
-        ((GameBoard) findViewById(R.id.the_canvas)).resetStarField();
+        ((GameBoard) findViewById(R.id.the_canvas)).bg.resetStarField();
         Point pBall, pTeamAGoalie, pTeamADefender1, pTeamADefender2, pTeamAAttacker1, pTeamAAttacker2, pTeamAAttacker3,
                 pTeamBGoalie, pTeamBDefender1, pTeamBDefender2, pTeamBAttacker1, pTeamBAttacker2, pTeamBAttacker3;
 

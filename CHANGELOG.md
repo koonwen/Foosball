@@ -71,3 +71,8 @@ TODO:
 *Update by Koon*
 1. Modularize Ball class
 2. Create interface for BoardItems
+
+### 28 October 2021
+*Update by Koon*
+1. Further modularization of board objects (Foosman and Background)
+2. Added FoosmanTeam class to encapsulate position info to send to the real-time database
