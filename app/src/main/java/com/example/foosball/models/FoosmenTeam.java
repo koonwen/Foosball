@@ -20,7 +20,7 @@ public class FoosmenTeam {
      * This method should only be called once to set up all the
      * relative positioning for the players in a team to the center point
      */
-    public void getRelativePos() {
+    public void fixRelativePos() {
         Iterator<Foosman> iterPlayer = playerList.iterator();
         while (iterPlayer.hasNext()) {
             Foosman curFoosman = iterPlayer.next();

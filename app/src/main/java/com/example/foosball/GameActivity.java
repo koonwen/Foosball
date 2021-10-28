@@ -274,7 +274,13 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
         for (int i = 0; i < foosmanNames.size(); i++) {
             ((GameBoard) findViewById(R.id.the_canvas)).getFoosman(foosmanNames.get(i)).setPoint(foosmanPoints.get(i).x - 50, foosmanPoints.get(i).y - 50);
         }
+        // Set Relative positions for the team
+        ((GameBoard) findViewById(R.id.the_canvas)).teamA.fixRelativePos();
+        ((GameBoard) findViewById(R.id.the_canvas)).teamB.fixRelativePos();
+
+
         ((GameBoard) findViewById(R.id.the_canvas)).b.setPoint(pBall.x, pBall.y);
+
 
         ballVelocity = new Point(6, -2);
 
