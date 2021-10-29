@@ -21,7 +21,10 @@ jobs:
         java-version: '11'
         distribution: 'adopt'
         cache: gradle
-
+    - name: Set up google-services.json
+      env:
+        FIREBASE_CONFIG_DEV: ${{ secrets.FIREBASE_CONFIG_DEV }}
+      run: echo $FIREBASE_CONFIG_DEV > ./app/google-services.json
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
