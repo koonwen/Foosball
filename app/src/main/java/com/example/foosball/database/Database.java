@@ -62,6 +62,15 @@ public class Database {
         });
     }
 
+    /**
+     * Creates a new record on the db with the corresponding game code and player name
+     *
+     * @param playerName Name of the player that is creating a new game
+     * @param createGameListener @see CreateGameListener
+     * @param ref The database reference
+     * @param gameCode Game code that has been randomly generated
+     */
+
     private static void setUpNewGame(String playerName, CreateGameListener createGameListener,
                                      DatabaseReference ref, String gameCode) {
         final DatabaseReference refGameStatus = getReferenceGameStatus(ref);
@@ -70,6 +79,14 @@ public class Database {
         refGameStatus.child(KEY_HAS_GAME_ENDED).setValue(false);
         createGameListener.onSuccess(gameCode);
     }
+
+    /**
+     * Adds the player details an existing game record on the database
+     *
+     * @param playerName Name of the current player
+     * @param gameCode Game code that matches the record on the database
+     * @param joinGameListener @see JoinGameListener
+     */
 
     public static void joinGame(String playerName, String gameCode,
                                 JoinGameListener joinGameListener) {
@@ -112,6 +129,14 @@ public class Database {
         });
     }
 
+    /**
+     * Updates the status of the game on the db to indicate that it has started
+     * and initialises the position and velocity of the ball to 0
+     *
+     * @param gameCode Game code of the corresponding record on the db
+     * @param basicDatabaseListener @see BasicDatabaseListener
+     */
+
     public static void updateStartGame(String gameCode,
                                        BasicDatabaseListener basicDatabaseListener) {
         final DatabaseReference ref = getGameReference(gameCode);
@@ -126,6 +151,14 @@ public class Database {
         });
     }
 
+    /**
+     * Removes player name from the relevant game in the db
+     *
+     * @param gameCode Game code of the corresponding record on the db
+     * @param playerId Whether the player to be removed is the 1st, 2nd, 3rd or 4th player in the lobby
+     * @param basicDatabaseListener @see BasicDatabaseListener
+     */
+
     public static void removePlayer(String gameCode, int playerId,
                                     BasicDatabaseListener basicDatabaseListener) {
         final DatabaseReference ref = getGameReference(gameCode);
@@ -136,6 +169,16 @@ public class Database {
         });
     }
 
+    /**
+     * Updates the ball coordinates in the db
+     *
+     * @param gameCode Game code of the corresponding record on the db
+     * @param x x coordinates
+     * @param y y coordinates
+     * @param vx x velocity
+     * @param vy y velocity
+     */
+
     public static void updateBallCoords(String gameCode, int x, int y, int vx, int vy) {
         final DatabaseReference ref = getGameReference(gameCode).child("ballCoords");
         ref.child("posX").setValue(x);
@@ -143,6 +186,13 @@ public class Database {
         ref.child("velocityX").setValue(vx);
         ref.child("velocityY").setValue(vy);
     }
+
+    /**
+     * Pulls any changes to the ball coordinates from the database
+     *
+     * @param gameCode Game code of the corresponding record on the db
+     * @param ballCoordsListener @see BallCoordsListener
+     */
 
     public static void getBallCoords(String gameCode,
                                      BallCoordsListener ballCoordsListener) {
@@ -171,10 +221,24 @@ public class Database {
         ref.child("ballCoords").addValueEventListener(postListener);
     }
 
+    /**
+     * Return a database reference to the relevant db record with a given game code
+     *
+     * @param gameCode Game code of the corresponding record on the db
+     * @return Database Reference
+     */
+
     private static DatabaseReference getGameReference(String gameCode) {
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         return database.getReference(DATABASE_PATH).child(gameCode);
     }
+
+    /**
+     * Pulls any updates to the status of the game and player names from the db
+     *
+     * @param gameCode Game code of the corresponding record on the db
+     * @param gameStatusListener @see GameStatusListener
+     */
 
     public static void startGameStatusListener(String gameCode,
                                                GameStatusListener gameStatusListener) {
@@ -211,11 +275,24 @@ public class Database {
         gameStatusValueEventListener = refGameStatus.addValueEventListener(postListener);
     }
 
+    /**
+     * Stops @startGameStatusListener once the game has started
+     *
+     * @param gameCode Game code of the corresponding record on the db
+     */
+
     public static void stopGameStatusListener(String gameCode) {
         final DatabaseReference ref = getGameReference(gameCode);
         final DatabaseReference refGameStatus = getReferenceGameStatus(ref);
         refGameStatus.removeEventListener(gameStatusValueEventListener);
     }
+
+    /** Prints an error message whenever other methods that accesses the db fails to connect
+     *
+     * @param task DataSnapShot
+     * @param databaseListener @see DatabaseListener
+     * @return Error message
+     */
 
     private static Task<DataSnapshot> handleFailure(Task<DataSnapshot> task,
                                                     DatabaseListener databaseListener) {
@@ -225,9 +302,22 @@ public class Database {
         });
     }
 
+    /**
+     * Returns a formatted string of "player1", "player2", "player3", or "player4" depending on ID
+     *
+     * @param playerId Any int between 1 - 4
+     * @return Formatted string with player key
+     */
     private static String getPlayerKey(int playerId) {
         return String.format(KEY_FORMAT_PLAYER, playerId);
     }
+
+    /**
+     * Returns the node on the db that contains the game status details
+     *
+     * @param ref Database reference based on a given game code
+     * @return Database reference to game status node
+     */
 
     private static DatabaseReference getReferenceGameStatus(DatabaseReference ref) {
         return ref.child("gameStatus");
