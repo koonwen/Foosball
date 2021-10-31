@@ -13,7 +13,16 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
+/**
+ * Initialises the lobby screen
+ */
+
 public class LobbyActivity extends FullScreenActivity {
+
+    /**
+     * Stores the player 1 - 4 text views in an array list
+     * @return array list of the text views in activity_lobby.xml
+     */
     private ArrayList<TextView> getPlayerTextViews() {
 
         ArrayList<TextView> playerTextViews = new ArrayList<>();
@@ -25,11 +34,18 @@ public class LobbyActivity extends FullScreenActivity {
         return playerTextViews;
     }
 
+    /**
+     * Initialises the logic of the buttons and pulls data from the db upon creation of the
+     * lobby activity
+     * @param savedInstanceState
+     */
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lobby);
 
+        // Sets the start game button as hidden by default
         final Button startGameButton = findViewById(R.id.startGame);
         startGameButton.setVisibility(View.GONE);
 
@@ -39,7 +55,22 @@ public class LobbyActivity extends FullScreenActivity {
                 getResources().getString(R.string.placeholder_player_name);
         gameCodeText.setText(gameCode);
 
+        /**
+         * Starts the game status listener to constantly update the player names and status of the game
+         */
         Database.startGameStatusListener(gameCode, new GameStatusListener() {
+
+            /**
+             * Method is called when the game status listener successfully fetches data from the db
+             *
+             * Updates the names of the players and sets the visibility of the start game button
+             * depending on whether the current player is player1 "i.e. host"
+             *
+             * @param playerNames List of player names.
+             * @param evenPlayers Whether there is an even number of players.
+             * @param gameStarted Whether the game has started.
+             * @param gameEnded Whether the game has ended.
+             */
             @Override
             public void onSuccess(ArrayList<String> playerNames, Boolean evenPlayers,
                                   Boolean gameStarted, Boolean gameEnded) {
@@ -81,6 +112,10 @@ public class LobbyActivity extends FullScreenActivity {
         final int playerId = Utils.getPlayerId(getApplicationContext());
 
         final Button returnMenu = findViewById(R.id.returnMenu);
+
+        /**
+         * Removes the current player when back button is clicked and starts the main menu activity
+         */
         returnMenu.setOnClickListener(view ->
                 Database.removePlayer(gameCode, playerId, new BasicDatabaseListener() {
                     @Override
@@ -96,6 +131,10 @@ public class LobbyActivity extends FullScreenActivity {
                 })
         );
 
+        /**
+         * Updates the status of the game on the db and starts the game activity when start game
+         * button is clicked
+         */
         startGameButton.setOnClickListener(view -> {
             Database.updateStartGame(gameCode, new BasicDatabaseListener() {
                 @Override

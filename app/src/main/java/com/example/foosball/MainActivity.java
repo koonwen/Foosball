@@ -12,8 +12,15 @@ import com.example.foosball.database.Database;
 import com.example.foosball.database.JoinGameListener;
 import com.google.android.material.snackbar.Snackbar;
 
+/**
+ * Initialises the main menu activity
+ */
 public class MainActivity extends FullScreenActivity {
 
+    /**
+     * Initialises text views, create and start game buttons when main menu activity is created
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,11 +35,20 @@ public class MainActivity extends FullScreenActivity {
         };
         editTextGameCode.setFilters(filters);
 
+        /**
+         * Saves the entered player name, creates a new game on the db with the relevant game code
+         * and starts the lobby activity
+         * First checks whether the user has entered text in the player name field.
+         */
         createGame.setOnClickListener(view -> {
             final String playerName = getPlayerName();
             if (playerName == null) {
                 return;
             }
+
+            /**
+             * Connects to the db and starts the lobby screen upon successful connection
+             */
             Database.createGame(playerName, new CreateGameListener() {
                 @Override
                 public void onConnectionError() {
@@ -47,6 +63,14 @@ public class MainActivity extends FullScreenActivity {
             });
         });
 
+        /**
+         * Checks the if the game code and player names fields are filled in.
+         * If they are, queries the db for the entry with the corresponding game code, and returns
+         * errors if there is connection error, lobby is full, game does not exist, or the
+         * game has already started.
+         *
+         * If not, starts the lobby screen activity.
+         */
         joinGame.setOnClickListener(view -> {
             editTextGameCode.setError(null);
             final String playerName = getPlayerName();
@@ -90,6 +114,10 @@ public class MainActivity extends FullScreenActivity {
         });
     }
 
+    /**
+     * Returns the entered player name as a string, if not prompts user to enter player name.
+     * @return string player name
+     */
     private String getPlayerName() {
         final EditText editTextPlayerName = findViewById(R.id.playerName);
         final String playerName = editTextPlayerName.getText().toString().trim();
@@ -104,6 +132,10 @@ public class MainActivity extends FullScreenActivity {
         return playerName;
     }
 
+    /**
+     * Returns the game code as a string, if not prompts user to enter game code.
+     * @return game code as a string
+     */
     private String getGameCode() {
         final EditText editTextGameCode = findViewById(R.id.gameCode);
         final String gameCode = editTextGameCode.getText().toString().trim();
@@ -117,15 +149,26 @@ public class MainActivity extends FullScreenActivity {
         return gameCode;
     }
 
+    /**
+     * Displays UI error message to user if unable to connect to db
+     */
     private void displayConnectionError() {
         displaySnackbar("Connection error. Please try again");
     }
 
+    /**
+     * Creates snack bar notification bar on UI with given error message.
+     * @param message String error message
+     */
     private void displaySnackbar(String message) {
         final View root = findViewById(R.id.root);
         Snackbar.make(root, message, Snackbar.LENGTH_SHORT).show();
     }
 
+    /**
+     * Starts the lobby activity with the provided game code.
+     * @param gameCode Game code
+     */
     private void goToLobbyScreen(String gameCode) {
         Utils.setGameCode(getApplicationContext(), gameCode);
         final Intent intent = new Intent(getApplicationContext(), LobbyActivity.class);
