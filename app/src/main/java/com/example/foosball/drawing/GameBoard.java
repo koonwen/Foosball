@@ -4,6 +4,7 @@ import com.example.foosball.models.Background;
 import com.example.foosball.models.Ball;
 import com.example.foosball.models.Foosman;
 import com.example.foosball.models.FoosmenTeam;
+import com.example.foosball.models.Goal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,9 +40,12 @@ public class GameBoard extends View{
     private Bitmap bmTeamA = BitmapFactory.decodeResource(getResources(), R.drawable.ship1);
     private Bitmap bmTeamB = BitmapFactory.decodeResource(getResources(), R.drawable.ship2);
     private Bitmap bmBall = BitmapFactory.decodeResource(getResources(), R.drawable.ball);
+//    private Bitmap bmGoal = BitmapFactory.decodeResource(getResources(), R.drawable.goal);
 
     public FoosmenTeam teamA = new FoosmenTeam(getHeight()/2);
     public FoosmenTeam teamB = new FoosmenTeam(getHeight()/2);
+    public Goal goalA = new Goal("Team A Goal", bmTeamA);
+    public Goal goalB = new Goal("Team B Goal", bmTeamB);
     public Background bg = new Background();
     public Ball b = new Ball(bmBall);
     private List<String> foosmanNames = Arrays.asList("TeamAGoalie", "TeamADefender1",
@@ -84,6 +88,10 @@ public class GameBoard extends View{
         }
         // Draw Ball
         b.refresh(canvas);
+
+        // Draw Goal
+        goalA.refresh(canvas);
+        goalB.refresh(canvas);
 
 
         /**

@@ -259,7 +259,7 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
 
     synchronized public void initGfx() {
         gameBoard.bg.resetStarField();
-        Point pBall, pTeamAGoalie, pTeamADefender1, pTeamADefender2, pTeamAAttacker1, pTeamAAttacker2, pTeamAAttacker3,
+        Point pTeamAGoal, pTeamBGoal, pBall, pTeamAGoalie, pTeamADefender1, pTeamADefender2, pTeamAAttacker1, pTeamAAttacker2, pTeamAAttacker3,
                 pTeamBGoalie, pTeamBDefender1, pTeamBDefender2, pTeamBAttacker1, pTeamBAttacker2, pTeamBAttacker3;
 
         // Generate Positions
@@ -271,12 +271,14 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
             foosmanList.add(gameBoard.getFoosman(name));
         }
 
+        pTeamAGoal = new Point((int) (canvasWidth * 0), (int) (canvasHeight * 0.5));
         pTeamAGoalie = new Point((int) (canvasWidth * 0.05), (int) (canvasHeight * 0.5));
         pTeamADefender1 = new Point((int) (canvasWidth * 0.20), (int) (canvasHeight * 0.625));
         pTeamADefender2 = new Point((int) (canvasWidth * 0.20), (int) (canvasHeight * 0.375));
         pTeamAAttacker1 = new Point((int) (canvasWidth * 0.60), (int) (canvasHeight * 0.75));
         pTeamAAttacker2 = new Point((int) (canvasWidth * 0.60), (int) (canvasHeight * 0.50));
         pTeamAAttacker3 = new Point((int) (canvasWidth * 0.60), (int) (canvasHeight * 0.25));
+        pTeamBGoal = new Point((int) (canvasWidth * 0.95), (int) (canvasHeight * 0.5));
         pTeamBGoalie = new Point((int) (canvasWidth * 0.90), (int) (canvasHeight * 0.50));
         pTeamBDefender1 = new Point((int) (canvasWidth * 0.80), (int) (canvasHeight * 0.625));
         pTeamBDefender2 = new Point((int) (canvasWidth * 0.80), (int) (canvasHeight * 0.375));
@@ -296,9 +298,9 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
         gameBoard.teamA.fixRelativePos();
         gameBoard.teamB.fixRelativePos();
 
-
         gameBoard.b.setPoint(pBall.x, pBall.y);
-
+        gameBoard.goalA.setPoint(pTeamAGoal.x, pTeamAGoal.y);
+        gameBoard.goalB.setPoint(pTeamBGoal.x, pTeamBGoal.y);
 
         ballVelocity = new Point(6, -2);
 
