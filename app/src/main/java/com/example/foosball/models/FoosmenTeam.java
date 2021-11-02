@@ -1,5 +1,8 @@
 package com.example.foosball.models;
 
+import com.example.foosball.database.CoordsListener;
+import com.example.foosball.database.Database;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -28,12 +31,14 @@ public class FoosmenTeam {
         }
     }
 
-    public void setyCord(int yCord) {
+    public void setYCord(int yCord) {
+        final int y = yCord - this.yCord;
+        moveFoosmen(y);
         this.yCord = yCord;
     }
 
-    public int getyCord() {
-        return yCord;
+    public int getYCord() {
+        return this.yCord;
     }
 
     /**
@@ -51,11 +56,18 @@ public class FoosmenTeam {
     }
 
     public void movePlayers(int y) {
+        moveFoosmen(y);
         yCord += y;
-        Iterator<Foosman> itertor = playerList.iterator();
-        while (itertor.hasNext()) {
-            Foosman p = itertor.next();
-            p.setY(p.getPointY() + y);
+    }
+
+    /**
+     * Move all individual foosmen.
+     *
+     * @param y Relative y displacement to move by.
+     */
+    private void moveFoosmen(int y) {
+        for (Foosman f: playerList) {
+            f.setY(f.getPointY() + y);
         }
     }
 }

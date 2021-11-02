@@ -5,7 +5,7 @@ package com.example.foosball.database;
  * ball coordinates and velocity.
  */
 
-public interface BallCoordsListener extends DatabaseListener {
+public interface CoordsListener extends DatabaseListener {
     /**
      * This method will be called in the event that accessing the balls coords is successful.
      *
@@ -14,5 +14,5 @@ public interface BallCoordsListener extends DatabaseListener {
      * @param vx x velocity
      * @param vy y velocity
      */
-    void onSuccess(int x, int y, int vx, int vy);
+    void onSuccess(int x, int y, int vx, int vy, int fya, int fyb);
 }

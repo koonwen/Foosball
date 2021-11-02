@@ -148,6 +148,8 @@ public class Database {
             refBallCoords.child("posY").setValue(0);
             refBallCoords.child("velocityX").setValue(0);
             refBallCoords.child("velocityY").setValue(0);
+            refBallCoords.child("fya").setValue(0);
+            refBallCoords.child("fyb").setValue(0);
         });
     }
 
@@ -179,23 +181,30 @@ public class Database {
      * @param vy y velocity
      */
 
-    public static void updateBallCoords(String gameCode, int x, int y, int vx, int vy) {
+    public static void updateCoordsHost(String gameCode, int x, int y, int vx, int vy, int fya) {
         final DatabaseReference ref = getGameReference(gameCode).child("ballCoords");
         ref.child("posX").setValue(x);
         ref.child("posY").setValue(y);
         ref.child("velocityX").setValue(vx);
         ref.child("velocityY").setValue(vy);
+        ref.child("fya").setValue(fya);
     }
+
+    public static void updateCoords(String gameCode, int fyb){
+        final DatabaseReference ref = getGameReference(gameCode).child("ballCoords");
+        ref.child("fyb").setValue(fyb);
+    }
+
 
     /**
      * Pulls any changes to the ball coordinates from the database
      *
      * @param gameCode Game code of the corresponding record on the db
-     * @param ballCoordsListener @see BallCoordsListener
+     * @param coordsListener @see BallCoordsListener
      */
 
-    public static void getBallCoords(String gameCode,
-                                     BallCoordsListener ballCoordsListener) {
+    public static void getCoords(String gameCode,
+                                     CoordsListener coordsListener) {
         final DatabaseReference ref = getGameReference(gameCode);
         ValueEventListener postListener = new ValueEventListener() {
             @Override
@@ -204,12 +213,17 @@ public class Database {
                 final Object yObj = dataSnapshot.child("posY").getValue();
                 final Object vxObj = dataSnapshot.child("velocityX").getValue();
                 final Object vyObj = dataSnapshot.child("velocityY").getValue();
-                assert xObj != null && yObj != null && vxObj != null && vyObj != null;
+                final Object fyaObj = dataSnapshot.child("fya").getValue();
+                final Object fybObj = dataSnapshot.child("fyb").getValue();
+                assert xObj != null && yObj != null && vxObj != null && vyObj != null &&
+                        fyaObj != null && fybObj != null;
                 final int x = ((Long) xObj).intValue();
                 final int y = ((Long) yObj).intValue();
                 final int vx = ((Long) vxObj).intValue();
                 final int vy = ((Long) vyObj).intValue();
-                ballCoordsListener.onSuccess(x, y, vx, vy);
+                final int fya = ((Long) fyaObj).intValue();
+                final int fyb = ((Long) fybObj).intValue();
+                coordsListener.onSuccess(x, y, vx, vy, fya, fyb);
             }
 
             @Override

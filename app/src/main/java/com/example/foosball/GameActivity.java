@@ -12,7 +12,7 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.ImageButton;
 
-import com.example.foosball.database.BallCoordsListener;
+import com.example.foosball.database.CoordsListener;
 import com.example.foosball.database.Database;
 import com.example.foosball.drawing.GameBoard;
 import com.example.foosball.models.Ball;
@@ -166,16 +166,30 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
     private void moveFoosman() {
         int canvasHeight = gameBoard.getHeight();
 
-        if (downButtonDown) {
-            if (gameBoard.getFoosman("TeamAAttacker1").getPointY() < (canvasHeight - 150)) {
-                gameBoard.teamA.movePlayers(5);
+        if (isGameHost) {
+            if (downButtonDown) {
+                if (gameBoard.getFoosman("TeamAAttacker1").getPointY() < (canvasHeight - 150)) {
+                    gameBoard.teamA.movePlayers(5);
+                }
+            }
+            if (upButtonDown) {
+                if (gameBoard.getFoosman("TeamAAttacker3").getPointY() > 50) {
+                    gameBoard.teamA.movePlayers(-5);
+                }
+            }
+        } else {
+            if (downButtonDown) {
+                if (gameBoard.getFoosman("TeamBAttacker1").getPointY() < (canvasHeight - 150)) {
+                    gameBoard.teamB.movePlayers(5);
+                }
+            }
+            if (upButtonDown) {
+                if (gameBoard.getFoosman("TeamBAttacker3").getPointY() > 50) {
+                    gameBoard.teamB.movePlayers(-5);
+                }
             }
         }
-        if (upButtonDown) {
-            if (gameBoard.getFoosman("TeamAAttacker3").getPointY() > 50) {
-                gameBoard.teamA.movePlayers(-5);
-            }
-        }
+
     }
 
 
@@ -211,15 +225,20 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
         gameCode = Utils.getGameCode(getApplicationContext());
         isGameHost = Utils.isGameHost(getApplicationContext());
         gameBoard = (GameBoard) findViewById(R.id.the_canvas);
-        if (!isGameHost) {
-            Database.getBallCoords(gameCode, new BallCoordsListener() {
+            Database.getCoords(gameCode, new CoordsListener() {
                 @Override
-                public void onSuccess(int x, int y, int vx, int vy) {
-                    if (ballVelocity != null) {
-                        ballVelocity.x = vx;
-                        ballVelocity.y = vy;
+                public void onSuccess(int x, int y, int vx, int vy, int fya, int fyb) {
+
+                    if (!isGameHost) {
+                        gameBoard.teamA.setYCord(fya);
+                        if (ballVelocity != null) {
+                            ballVelocity.x = vx;
+                            ballVelocity.y = vy;
+                        }
+                        gameBoard.b.setPoint(x, y);
+                    } else {
+                        gameBoard.teamB.setYCord(fyb);
                     }
-                    gameBoard.b.setPoint(x, y);
                 }
 
                 @Override
@@ -227,7 +246,6 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
 
                 }
             });
-        }
     }
 
     private Point getRandomVelocity() {
@@ -318,9 +336,12 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
             }
             gameBoard.b.setPoint(ball.x, ball.y);
 
+            // This assumes 2 player game and sends coords to db
             if (isGameHost) {
-                Database.updateBallCoords(gameCode, ball.x, ball.y, ballVelocity.x,
-                        ballVelocity.y);
+                Database.updateCoordsHost(gameCode, ball.x, ball.y, ballVelocity.x,
+                        ballVelocity.y, gameBoard.teamA.getYCord());
+            } else {
+                Database.updateCoords(gameCode, gameBoard.teamB.getYCord());
             }
 
             gameBoard.invalidate();
