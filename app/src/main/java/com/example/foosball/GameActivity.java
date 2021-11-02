@@ -15,10 +15,8 @@ import android.widget.ImageButton;
 import com.example.foosball.database.BallCoordsListener;
 import com.example.foosball.database.Database;
 import com.example.foosball.drawing.GameBoard;
-import com.example.foosball.models.Background;
 import com.example.foosball.models.Ball;
 import com.example.foosball.models.Foosman;
-import com.example.foosball.models.FoosmenTeam;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,6 +52,7 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
     private final List<String> foosmanNamesTeamA = Arrays.asList("TeamAGoalie", "TeamADefender1",
             "TeamADefender2", "TeamAAttacker1", "TeamAAttacker2", "TeamAAttacker3");
     private final List<Foosman> foosmanList = new ArrayList<Foosman>();
+    private GameBoard gameBoard;
 
     //Method for getting touch state--requires android 2.1 or greater
     //    @Override
@@ -165,16 +164,16 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
      * If false, it specifies a new position for each foosmen by 5 in the Y-direction.
      */
     private void moveFoosman() {
-        int canvasHeight = findViewById(R.id.the_canvas).getHeight();
+        int canvasHeight = gameBoard.getHeight();
 
         if (downButtonDown) {
-            if (((GameBoard) findViewById(R.id.the_canvas)).getFoosman("TeamAAttacker1").getPointY() < (canvasHeight - 150)) {
-                ((GameBoard) findViewById(R.id.the_canvas)).teamA.movePlayers(5);
+            if (gameBoard.getFoosman("TeamAAttacker1").getPointY() < (canvasHeight - 150)) {
+                gameBoard.teamA.movePlayers(5);
             }
         }
         if (upButtonDown) {
-            if (((GameBoard) findViewById(R.id.the_canvas)).getFoosman("TeamAAttacker3").getPointY() > 50) {
-                ((GameBoard) findViewById(R.id.the_canvas)).teamA.movePlayers(-5);
+            if (gameBoard.getFoosman("TeamAAttacker3").getPointY() > 50) {
+                gameBoard.teamA.movePlayers(-5);
             }
         }
     }
@@ -211,6 +210,7 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
         }, 1000);
         gameCode = Utils.getGameCode(getApplicationContext());
         isGameHost = Utils.isGameHost(getApplicationContext());
+        gameBoard = (GameBoard) findViewById(R.id.the_canvas);
         if (!isGameHost) {
             Database.getBallCoords(gameCode, new BallCoordsListener() {
                 @Override
@@ -219,7 +219,7 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
                         ballVelocity.x = vx;
                         ballVelocity.y = vy;
                     }
-                    ((GameBoard) findViewById(R.id.the_canvas)).b.setPoint(x, y);
+                    gameBoard.b.setPoint(x, y);
                 }
 
                 @Override
@@ -240,17 +240,17 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
     }
 
     synchronized public void initGfx() {
-        ((GameBoard) findViewById(R.id.the_canvas)).bg.resetStarField();
+        gameBoard.bg.resetStarField();
         Point pBall, pTeamAGoalie, pTeamADefender1, pTeamADefender2, pTeamAAttacker1, pTeamAAttacker2, pTeamAAttacker3,
                 pTeamBGoalie, pTeamBDefender1, pTeamBDefender2, pTeamBAttacker1, pTeamBAttacker2, pTeamBAttacker3;
 
         // Generate Positions
-        int canvasWidth = findViewById(R.id.the_canvas).getWidth();
-        int canvasHeight = findViewById(R.id.the_canvas).getHeight();
+        int canvasWidth = gameBoard.getWidth();
+        int canvasHeight = gameBoard.getHeight();
 
         // Retrieve Foosmen
         for (String name : foosmanNames) {
-            foosmanList.add(((GameBoard) findViewById(R.id.the_canvas)).getFoosman(name));
+            foosmanList.add(gameBoard.getFoosman(name));
         }
 
         pTeamAGoalie = new Point((int) (canvasWidth * 0.05), (int) (canvasHeight * 0.5));
@@ -272,24 +272,24 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
 
         // Set Positions
         for (int i = 0; i < foosmanNames.size(); i++) {
-            ((GameBoard) findViewById(R.id.the_canvas)).getFoosman(foosmanNames.get(i)).setPoint(foosmanPoints.get(i).x - 50, foosmanPoints.get(i).y - 50);
+            gameBoard.getFoosman(foosmanNames.get(i)).setPoint(foosmanPoints.get(i).x - 50, foosmanPoints.get(i).y - 50);
         }
         // Set Relative positions for the team
-        ((GameBoard) findViewById(R.id.the_canvas)).teamA.fixRelativePos();
-        ((GameBoard) findViewById(R.id.the_canvas)).teamB.fixRelativePos();
+        gameBoard.teamA.fixRelativePos();
+        gameBoard.teamB.fixRelativePos();
 
 
-        ((GameBoard) findViewById(R.id.the_canvas)).b.setPoint(pBall.x, pBall.y);
+        gameBoard.b.setPoint(pBall.x, pBall.y);
 
 
         ballVelocity = new Point(6, -2);
 
-        ballMaxX = findViewById(R.id.the_canvas).getWidth() - ((GameBoard) findViewById(R.id.the_canvas)).b.getWidth();
-        ballMaxY = findViewById(R.id.the_canvas).getHeight() - ((GameBoard) findViewById(R.id.the_canvas)).b.getHeight();
+        ballMaxX = gameBoard.getWidth() - gameBoard.b.getWidth();
+        ballMaxY = gameBoard.getHeight() - gameBoard.b.getHeight();
         ((ImageButton) findViewById(R.id.up_button)).setEnabled(true);
         ((ImageButton) findViewById(R.id.down_button)).setEnabled(true);
         frame.removeCallbacks(frameUpdate);
-        ((GameBoard) findViewById(R.id.the_canvas)).invalidate(); // marks the canvas as outdated - so it will be updated on next frame
+        gameBoard.invalidate(); // marks the canvas as outdated - so it will be updated on next frame
         frame.postDelayed(frameUpdate, FRAME_RATE);
     }
 
@@ -301,13 +301,13 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
             frame.removeCallbacks(frameUpdate);
 
 
-            hasCollided = checkCollision(((GameBoard) findViewById(R.id.the_canvas)).b, foosmanList);
+            hasCollided = checkCollision(gameBoard.b, foosmanList);
             handleCollision();
             moveFoosman();
             updateVelocity();
 
-            Point ball = new Point(((GameBoard) findViewById(R.id.the_canvas)).b.getPointX(),
-                    ((GameBoard) findViewById(R.id.the_canvas)).b.getPointY());
+            Point ball = new Point(gameBoard.b.getPointX(),
+                    gameBoard.b.getPointY());
             ball.x = ball.x + ballVelocity.x;
             if (ball.x > ballMaxX || ball.x < 5) {
                 ballVelocity.x *= -1;
@@ -316,14 +316,14 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
             if (ball.y > ballMaxY || ball.y < 5) {
                 ballVelocity.y *= -1;
             }
-            ((GameBoard) findViewById(R.id.the_canvas)).b.setPoint(ball.x, ball.y);
+            gameBoard.b.setPoint(ball.x, ball.y);
 
             if (isGameHost) {
                 Database.updateBallCoords(gameCode, ball.x, ball.y, ballVelocity.x,
                         ballVelocity.y);
             }
 
-            ((GameBoard) findViewById(R.id.the_canvas)).invalidate();
+            gameBoard.invalidate();
             frame.postDelayed(frameUpdate, FRAME_RATE);
         }
 
