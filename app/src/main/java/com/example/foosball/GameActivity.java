@@ -53,6 +53,7 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
             "TeamADefender2", "TeamAAttacker1", "TeamAAttacker2", "TeamAAttacker3");
     private final List<Foosman> foosmanList = new ArrayList<Foosman>();
     private GameBoard gameBoard;
+    private static final Database database = Database.getInstance();
 
     //Method for getting touch state--requires android 2.1 or greater
     //    @Override
@@ -225,27 +226,27 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
         gameCode = Utils.getGameCode(getApplicationContext());
         isGameHost = Utils.isGameHost(getApplicationContext());
         gameBoard = (GameBoard) findViewById(R.id.the_canvas);
-            Database.getCoords(gameCode, new CoordsListener() {
-                @Override
-                public void onSuccess(int x, int y, int vx, int vy, int fya, int fyb) {
+        database.getCoords(new CoordsListener() {
+            @Override
+            public void onSuccess(int x, int y, int vx, int vy, int fya, int fyb) {
 
-                    if (!isGameHost) {
-                        gameBoard.teamA.setYCord(fya);
-                        if (ballVelocity != null) {
-                            ballVelocity.x = vx;
-                            ballVelocity.y = vy;
-                        }
-                        gameBoard.b.setPoint(x, y);
-                    } else {
-                        gameBoard.teamB.setYCord(fyb);
+                if (!isGameHost) {
+                    gameBoard.teamA.setYCord(fya);
+                    if (ballVelocity != null) {
+                        ballVelocity.x = vx;
+                        ballVelocity.y = vy;
                     }
+                    gameBoard.b.setPoint(x, y);
+                } else {
+                    gameBoard.teamB.setYCord(fyb);
                 }
+            }
 
-                @Override
-                public void onConnectionError() {
+            @Override
+            public void onConnectionError() {
 
-                }
-            });
+            }
+        });
     }
 
     private Point getRandomVelocity() {
@@ -340,10 +341,10 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
 
             // This assumes 2 player game and sends coords to db
             if (isGameHost) {
-                Database.updateCoordsHost(gameCode, ball.x, ball.y, ballVelocity.x,
-                        ballVelocity.y, gameBoard.teamA.getYCord());
+                database.updateCoordsHost(ball.x, ball.y, ballVelocity.x, ballVelocity.y,
+                        gameBoard.teamA.getYCord());
             } else {
-                Database.updateCoords(gameCode, gameBoard.teamB.getYCord());
+                database.updateCoords(gameBoard.teamB.getYCord());
             }
 
             gameBoard.invalidate();

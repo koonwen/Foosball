@@ -9,7 +9,6 @@ import android.widget.TextView;
 import com.example.foosball.database.BasicDatabaseListener;
 import com.example.foosball.database.Database;
 import com.example.foosball.database.GameStatusListener;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -21,6 +20,7 @@ public class LobbyActivity extends FullScreenActivity {
 
     /**
      * Stores the player 1 - 4 text views in an array list
+     *
      * @return array list of the text views in activity_lobby.xml
      */
     private ArrayList<TextView> getPlayerTextViews() {
@@ -37,6 +37,7 @@ public class LobbyActivity extends FullScreenActivity {
     /**
      * Initialises the logic of the buttons and pulls data from the db upon creation of the
      * lobby activity
+     *
      * @param savedInstanceState
      */
 
@@ -55,10 +56,11 @@ public class LobbyActivity extends FullScreenActivity {
                 getResources().getString(R.string.placeholder_player_name);
         gameCodeText.setText(gameCode);
 
+        final Database database = Database.getInstance();
         /**
          * Starts the game status listener to constantly update the player names and status of the game
          */
-        Database.startGameStatusListener(gameCode, new GameStatusListener() {
+        database.startGameStatusListener(new GameStatusListener() {
 
             /**
              * Method is called when the game status listener successfully fetches data from the db
@@ -98,7 +100,7 @@ public class LobbyActivity extends FullScreenActivity {
                 if (!Utils.isGameHost(getApplicationContext()) && gameStarted && !gameEnded) {
                     final Intent intent = new Intent(getApplicationContext(),
                             GameActivity.class);
-                    Database.stopGameStatusListener(gameCode);
+                    database.stopGameStatusListener();
                     startActivity(intent);
                 }
             }
@@ -117,7 +119,7 @@ public class LobbyActivity extends FullScreenActivity {
          * Removes the current player when back button is clicked and starts the main menu activity
          */
         returnMenu.setOnClickListener(view ->
-                Database.removePlayer(gameCode, playerId, new BasicDatabaseListener() {
+                database.removePlayer(playerId, new BasicDatabaseListener() {
                     @Override
                     public void onSuccess() {
                         final Intent intent = new Intent(getApplicationContext(),
@@ -136,7 +138,7 @@ public class LobbyActivity extends FullScreenActivity {
          * button is clicked
          */
         startGameButton.setOnClickListener(view -> {
-            Database.updateStartGame(gameCode, new BasicDatabaseListener() {
+            database.updateStartGame(new BasicDatabaseListener() {
                 @Override
                 public void onSuccess() {
                 }
@@ -145,7 +147,7 @@ public class LobbyActivity extends FullScreenActivity {
                 public void onConnectionError() {
                 }
             });
-            Database.stopGameStatusListener(gameCode);
+            database.stopGameStatusListener();
             final Intent intent = new Intent(getApplicationContext(), GameActivity.class);
             startActivity(intent);
         });

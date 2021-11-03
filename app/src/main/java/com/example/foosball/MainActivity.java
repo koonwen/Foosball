@@ -19,6 +19,7 @@ public class MainActivity extends FullScreenActivity {
 
     /**
      * Initialises text views, create and start game buttons when main menu activity is created
+     *
      * @param savedInstanceState
      */
     @Override
@@ -34,6 +35,7 @@ public class MainActivity extends FullScreenActivity {
                 new InputFilter.LengthFilter(Utils.NUM_CHARS_GAME_CODE)
         };
         editTextGameCode.setFilters(filters);
+        final Database database = Database.getInstance();
 
         /**
          * Saves the entered player name, creates a new game on the db with the relevant game code
@@ -49,7 +51,7 @@ public class MainActivity extends FullScreenActivity {
             /**
              * Connects to the db and starts the lobby screen upon successful connection
              */
-            Database.createGame(playerName, new CreateGameListener() {
+            database.createGame(playerName, new CreateGameListener() {
                 @Override
                 public void onConnectionError() {
                     displayConnectionError();
@@ -82,7 +84,7 @@ public class MainActivity extends FullScreenActivity {
                 return;
             }
 
-            Database.joinGame(playerName, gameCode, new JoinGameListener() {
+            database.joinGame(playerName, gameCode, new JoinGameListener() {
                 @Override
                 public void onConnectionError() {
                     displayConnectionError();
@@ -116,6 +118,7 @@ public class MainActivity extends FullScreenActivity {
 
     /**
      * Returns the entered player name as a string, if not prompts user to enter player name.
+     *
      * @return string player name
      */
     private String getPlayerName() {
@@ -134,6 +137,7 @@ public class MainActivity extends FullScreenActivity {
 
     /**
      * Returns the game code as a string, if not prompts user to enter game code.
+     *
      * @return game code as a string
      */
     private String getGameCode() {
@@ -158,6 +162,7 @@ public class MainActivity extends FullScreenActivity {
 
     /**
      * Creates snack bar notification bar on UI with given error message.
+     *
      * @param message String error message
      */
     private void displaySnackbar(String message) {
@@ -167,6 +172,7 @@ public class MainActivity extends FullScreenActivity {
 
     /**
      * Starts the lobby activity with the provided game code.
+     *
      * @param gameCode Game code
      */
     private void goToLobbyScreen(String gameCode) {
