@@ -17,10 +17,18 @@ public class Background {
     private static final int NUM_OF_STARS = 36;
     private Paint p = new Paint();
 
+    /**
+     * Resets star field to null on every new game
+     */
     synchronized public void resetStarField() {
         starField = null;
     }
 
+    /**
+     * initializing sequence for the star field
+     * @param maxX canvas maxX
+     * @param maxY canvas maxY
+     */
     synchronized private void initializeStars(int maxX, int maxY) {
         starField = new ArrayList<Point>();
         for (int i = 0; i < NUM_OF_STARS; i++) {
@@ -31,6 +39,12 @@ public class Background {
         }
     }
 
+    /**
+     * refresh function to be called every frame to produce blinking effect
+     * @param canvas
+     * @param maxX
+     * @param maxY
+     */
     public void refresh(Canvas canvas, int maxX, int maxY) {
         p.setColor(Color.BLACK);
         p.setAlpha(255);

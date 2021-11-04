@@ -344,7 +344,7 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
 
         gameBoard.b.setPoint(pBall.x, pBall.y);
         gameBoard.goalA.setGoalPoints(5, (int) (canvasHeight * 0.7), (int) (canvasHeight * 0.3));
-        gameBoard.goalB.setGoalPoints(canvasWidth-5, (int) (canvasHeight * 0.7), (int) (canvasHeight * 0.3));
+        gameBoard.goalB.setGoalPoints(canvasWidth - 5, (int) (canvasHeight * 0.7), (int) (canvasHeight * 0.3));
 
         ballVelocity = new Point(10, -2);
 
@@ -373,7 +373,8 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
             if (gameBoard.goalB.getConceeded() >= 3 || gameBoard.goalA.getConceeded() >= 3) {
                 endGame(findViewById(R.id.the_canvas));
                 return;
-            };
+            }
+            ;
 
             frame.removeCallbacks(frameUpdate);
 
@@ -388,13 +389,11 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
                     gameBoard.b.getPointY());
             ball.x = ball.x + ballVelocity.x;
             if (ball.x > ballMaxX || ball.x < 5) {
-              if (ball.x > ballMaxX) {
-                  if (gameBoard.goalB.checkGoal(ball.y, findViewById(R.id.the_canvas)))
-                      gameBoard.b.setPoint((int) (gameBoard.getWidth() * 0.25), (int) (gameBoard.getHeight() * 0.75));
-              } else {
-                  if (gameBoard.goalA.checkGoal(ball.y, findViewById(R.id.the_canvas)))
-                      gameBoard.b.setPoint((int) (gameBoard.getWidth() * 0.25), (int) (gameBoard.getHeight() * 0.75));
-              }
+                if (ball.x > ballMaxX) {
+                    gameBoard.goalB.checkGoal(ball.y, findViewById(R.id.the_canvas));
+                } else {
+                    gameBoard.goalA.checkGoal(ball.y, findViewById(R.id.the_canvas));
+                }
                 ballVelocity.x *= -1;
             }
             ball.y = ball.y + ballVelocity.y;

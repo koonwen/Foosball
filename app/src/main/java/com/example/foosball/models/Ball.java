@@ -107,39 +107,15 @@ public class Ball implements BoardItem {
         return this.point.x;
     }
 
-    /**
-     * Getter for the y-coordinate of the ball position
-     *
-     * @return y-coordinate
-     */
     @Override
     public int getPointY() {
-        return this.point.y;
+        return 0;
     }
 
     /**
-     * Getter for the bounds of the ball object
-     *
-     * @return bounds of the ball
+     * Getter for the width of the ball object bounds
+     * @return ball object bound width
      */
-//    @Override
-//    public Rect getBounds() {
-//        return bounds;
-//    }
-//
-//    /**
-//     * Setter for the bounds of the ball object
-//     * @param bounds
-//     */
-//    @Override
-//    public void setBounds(Rect bounds) {
-//        this.bounds = bounds;
-//    }
-//
-//    /**
-//     * Getter for the width of the ball object bounds
-//     * @return ball object bound width
-//     */
     @Override
     public int getWidth() {
         return bounds.width();
