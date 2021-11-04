@@ -1,8 +1,5 @@
 package com.example.foosball.models;
 
-import com.example.foosball.database.CoordsListener;
-import com.example.foosball.database.Database;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -11,12 +8,13 @@ import java.util.Iterator;
  */
 
 public class FoosmenTeam {
-    private ArrayList<Foosman> playerList = new ArrayList<Foosman>(5);
-    private ArrayList<Integer> relativePos = new ArrayList<Integer>(5);
+    private final ArrayList<Foosman> playerList = new ArrayList<Foosman>(5);
+    private final ArrayList<Integer> relativePos = new ArrayList<Integer>(5);
     private int yCord;
 
     /**
      * Sets the y coordinates of the foosmen team to the given ycord
+     *
      * @param yCord Absolute y coordinates
      */
     public FoosmenTeam(int yCord) {
@@ -25,6 +23,7 @@ public class FoosmenTeam {
 
     /**
      * Adds a Foosman to the team player list
+     *
      * @param player New foosman player
      */
     public void addPlayer(Foosman player) {
@@ -39,13 +38,14 @@ public class FoosmenTeam {
         Iterator<Foosman> iterPlayer = playerList.iterator();
         while (iterPlayer.hasNext()) {
             Foosman curFoosman = iterPlayer.next();
-            relativePos.add(curFoosman.getPointY()-yCord);
+            relativePos.add(curFoosman.getPointY() - yCord);
         }
     }
 
     /**
      * Updates the yCord attribute after moving the foosmen team by the difference between
      * the old and new yCords
+     *
      * @param yCord Integer, new absolute y coordinates.
      */
     public void setYCord(int yCord) {
@@ -56,6 +56,7 @@ public class FoosmenTeam {
 
     /**
      * Returns the current y cord of the team
+     *
      * @return Integer absolute y coordinates
      */
 
@@ -79,6 +80,7 @@ public class FoosmenTeam {
 
     /**
      * Move all players in the Foosman Team
+     *
      * @param y Relative y coordinates to move the team by
      */
     public void movePlayers(int y) {
@@ -92,7 +94,7 @@ public class FoosmenTeam {
      * @param y Relative y displacement to move by.
      */
     private void moveFoosmen(int y) {
-        for (Foosman f: playerList) {
+        for (Foosman f : playerList) {
             f.setY(f.getPointY() + y);
         }
     }

@@ -1,13 +1,11 @@
 package com.example.foosball;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class EndGameActivity extends AppCompatActivity {
+public class EndGameActivity extends FullScreenActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +24,7 @@ public class EndGameActivity extends AppCompatActivity {
                 winner += "Team A!!!";
             }
         }
-        winner += "\nScore " + teamAConceeeded +  " - " + teamBConceeded;
+        winner += "\nScore " + teamAConceeeded + " - " + teamBConceeded;
 
         TextView score = (TextView) findViewById(R.id.scoreTextView);
         score.setText(winner);
