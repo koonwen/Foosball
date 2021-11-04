@@ -164,13 +164,4 @@ public class Ball implements BoardItem {
         }
         canvas.drawBitmap(bm, mball, null);
     }
-
-    public boolean goalScored(Goal goal1, Goal goal2) {
-        if (point.y < goal1.getTop() && point.y > goal1.getBottom() &&
-            point.x < goal1.getLeft() && point.x > goal1.getRight() ||
-            point.y < goal2.getTop() && point.y > goal2.getBottom() &&
-            point.x < goal2.getLeft() && point.x > goal2.getRight()) {
-            return true;
-        } return false;
-    }
 }
