@@ -2,4 +2,15 @@
     <string name="app_name">Foosball</string>
     <string name="game_title">FOOSBALL</string>
     <string name="placeholder_player_name">Waiting for player…</string>
+    <string name="space_foosball">Space Foosball</string>
+    <string name="player_name">Player name</string>
+    <string name="create_game">Create Game</string>
+    <string name="enter_code">Enter code</string>
+    <string name="join_game">Join Game</string>
+    <string name="graphic_logo">Graphic logo</string>
+    <string name="lobby">LOBBY</string>
+    <string name="code">CODE:</string>
+    <string name="to_add">TO_ADD</string>
+    <string name="return_to_menu">RETURN TO MENU</string>
+    <string name="start_game">START GAME</string>
 </resources>

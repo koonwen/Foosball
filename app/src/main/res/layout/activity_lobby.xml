@@ -10,7 +10,11 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <Space
             android:layout_width="match_parent"
@@ -19,7 +23,8 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_weight="1"
             android:orientation="vertical">
 
@@ -27,6 +32,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:adjustViewBounds="true"
+                android:contentDescription="@string/graphic_logo"
                 android:maxWidth="60dp"
                 android:maxHeight="60dp"
                 android:scaleType="fitCenter"
@@ -37,7 +43,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-black"
-                android:text="LOBBY"
+                android:text="@string/lobby"
                 android:textAlignment="center"
                 android:textColor="#FFFFFF"
                 android:textSize="24sp" />
@@ -45,6 +51,7 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:layout_marginTop="10dp"
                 android:orientation="horizontal">
 
@@ -53,17 +60,17 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-medium"
-                    android:text="CODE: "
+                    android:text="@string/code"
                     android:textColor="#FFFFFF"
                     android:textSize="16sp" />
 
                 <TextView
                     android:id="@+id/codeID"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:fontFamily="sans-serif-medium"
-                    android:text="TO_ADD"
+                    android:text="@string/to_add"
                     android:textColor="#FFFFFF"
                     android:textSize="16sp" />
 
@@ -75,7 +82,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="6dp"
                 android:background="@drawable/border"
-                android:backgroundTint="#969BB8"
+                android:backgroundTint="#515571"
                 android:padding="6dp"
                 android:text="@string/placeholder_player_name"
                 android:textColor="#FFFFFF"
@@ -88,7 +95,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="6dp"
                 android:background="@drawable/border"
-                android:backgroundTint="#969BB8"
+                android:backgroundTint="#515571"
                 android:padding="6dp"
                 android:text="@string/placeholder_player_name"
                 android:textColor="#FFFFFF"
@@ -100,14 +107,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#254794"
-                android:text="RETURN TO MENU" />
+                android:text="@string/return_to_menu" />
 
             <Button
                 android:id="@+id/startGame"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:backgroundTint="#254794"
-                android:text="START GAME" />
+                android:text="@string/start_game" />
 
         </LinearLayout>
 
