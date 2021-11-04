@@ -1,16 +1,23 @@
 package com.example.foosball;
 
+import android.os.Bundle;
 import android.view.View;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 /**
  * Extend this class for activities that need to be full screen.
  */
 public abstract class FullScreenActivity extends AppCompatActivity {
-    // TODO: There are some issues with the full screen mode
-    // TODO: - Transition between activities shows bars temporarily
-    // TODO: - When soft keyboard is shown, it doesn't expand to full width - there's a gap where the bars should be
+    // Known issue: When soft keyboard is shown, it doesn't expand to full width. There's a gap
+    // where the navigation bar should be.
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        hideSystemUI();
+    }
 
     // Code referenced from https://developer.android.com/training/system-ui/immersive
     @Override
