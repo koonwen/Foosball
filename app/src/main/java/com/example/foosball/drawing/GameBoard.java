@@ -34,18 +34,17 @@ import android.view.View;
  * It renders the background (stars field), ball and foosmen objects.
  */
 
-public class GameBoard extends View{
+public class GameBoard extends View {
 
     // Bitmaps
     private Bitmap bmTeamA = BitmapFactory.decodeResource(getResources(), R.drawable.ship1);
     private Bitmap bmTeamB = BitmapFactory.decodeResource(getResources(), R.drawable.ship2);
     private Bitmap bmBall = BitmapFactory.decodeResource(getResources(), R.drawable.ball);
-//    private Bitmap bmGoal = BitmapFactory.decodeResource(getResources(), R.drawable.goal);
 
     public FoosmenTeam teamA = new FoosmenTeam(getHeight()/2);
     public FoosmenTeam teamB = new FoosmenTeam(getHeight()/2);
-    public Goal goalA = new Goal("Team A Goal", bmTeamA);
-    public Goal goalB = new Goal("Team B Goal", bmTeamB);
+    public Goal goalA = new Goal("Team A Goal");
+    public Goal goalB = new Goal("Team B Goal");
     public Background bg = new Background();
     public Ball b = new Ball(bmBall);
     private List<String> foosmanNames = Arrays.asList("TeamAGoalie", "TeamADefender1",

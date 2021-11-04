@@ -1,5 +1,6 @@
 package com.example.foosball;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -7,10 +8,13 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.ImageButton;
+
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import com.example.foosball.database.CoordsListener;
 import com.example.foosball.database.Database;
@@ -259,7 +263,7 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
 
     synchronized public void initGfx() {
         gameBoard.bg.resetStarField();
-        Point pTeamAGoal, pTeamBGoal, pBall, pTeamAGoalie, pTeamADefender1, pTeamADefender2, pTeamAAttacker1, pTeamAAttacker2, pTeamAAttacker3,
+        Point pBall, pTeamAGoalie, pTeamADefender1, pTeamADefender2, pTeamAAttacker1, pTeamAAttacker2, pTeamAAttacker3,
                 pTeamBGoalie, pTeamBDefender1, pTeamBDefender2, pTeamBAttacker1, pTeamBAttacker2, pTeamBAttacker3;
 
         // Generate Positions
@@ -271,14 +275,12 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
             foosmanList.add(gameBoard.getFoosman(name));
         }
 
-        pTeamAGoal = new Point((int) (canvasWidth * 0), (int) (canvasHeight * 0.5));
         pTeamAGoalie = new Point((int) (canvasWidth * 0.05), (int) (canvasHeight * 0.5));
         pTeamADefender1 = new Point((int) (canvasWidth * 0.20), (int) (canvasHeight * 0.625));
         pTeamADefender2 = new Point((int) (canvasWidth * 0.20), (int) (canvasHeight * 0.375));
         pTeamAAttacker1 = new Point((int) (canvasWidth * 0.60), (int) (canvasHeight * 0.75));
         pTeamAAttacker2 = new Point((int) (canvasWidth * 0.60), (int) (canvasHeight * 0.50));
         pTeamAAttacker3 = new Point((int) (canvasWidth * 0.60), (int) (canvasHeight * 0.25));
-        pTeamBGoal = new Point((int) (canvasWidth * 0.95), (int) (canvasHeight * 0.5));
         pTeamBGoalie = new Point((int) (canvasWidth * 0.90), (int) (canvasHeight * 0.50));
         pTeamBDefender1 = new Point((int) (canvasWidth * 0.80), (int) (canvasHeight * 0.625));
         pTeamBDefender2 = new Point((int) (canvasWidth * 0.80), (int) (canvasHeight * 0.375));
@@ -299,8 +301,8 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
         gameBoard.teamB.fixRelativePos();
 
         gameBoard.b.setPoint(pBall.x, pBall.y);
-        gameBoard.goalA.setPoint(pTeamAGoal.x, pTeamAGoal.y);
-        gameBoard.goalB.setPoint(pTeamBGoal.x, pTeamBGoal.y);
+        gameBoard.goalA.setGoalPoints(5, (int) (canvasHeight * 0.7), (int) (canvasHeight * 0.3));
+        gameBoard.goalB.setGoalPoints(canvasWidth-5, (int) (canvasHeight * 0.7), (int) (canvasHeight * 0.3));
 
         ballVelocity = new Point(6, -2);
 
@@ -313,11 +315,24 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
         frame.postDelayed(frameUpdate, FRAME_RATE);
     }
 
+    public void endGame(View view) {
+        Intent intent = new Intent(this, EndGameActivity.class);
+        intent.putExtra("teamA", gameBoard.goalA.getConceeded());
+        intent.putExtra("teamB", gameBoard.goalB.getConceeded());
+        startActivity(intent);
+    }
+
 
     private final Runnable frameUpdate = new Runnable() {
 
         @Override
         synchronized public void run() {
+
+            if (gameBoard.goalB.getConceeded() >= 3 || gameBoard.goalA.getConceeded() >= 3) {
+                endGame(findViewById(R.id.the_canvas));
+                return;
+            };
+
             frame.removeCallbacks(frameUpdate);
 
 
@@ -330,6 +345,11 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
                     gameBoard.b.getPointY());
             ball.x = ball.x + ballVelocity.x;
             if (ball.x > ballMaxX || ball.x < 5) {
+              if (ball.x > ballMaxX) {
+                  gameBoard.goalB.checkGoal(ball.y, findViewById(R.id.the_canvas));
+              } else {
+                  gameBoard.goalA.checkGoal(ball.y, findViewById(R.id.the_canvas));
+              }
                 ballVelocity.x *= -1;
             }
             ball.y = ball.y + ballVelocity.y;
