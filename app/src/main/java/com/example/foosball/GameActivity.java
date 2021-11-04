@@ -7,6 +7,7 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -38,8 +39,10 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
     // acceleration flag
     private final boolean isAccelerating = false;
 
-    private boolean hasCollided = false;
-    private boolean collisionFromTopOrBottom = false;
+    private boolean collisionFromTop = false;
+    private boolean collisionFromLeft = false;
+    private boolean collisionFromRight = false;
+    private boolean collisionFromBottom = false;
     private boolean upButtonDown = false;
     private boolean downButtonDown = false;
     private static final int FPS = 50;
@@ -81,8 +84,8 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
         int xDir = (ballVelocity.x > 0) ? 1 : -1;
         int yDir = (ballVelocity.y > 0) ? 1 : -1;
         int speed = 0;
-        if (ballVelocity.x > 7) {
-            speed = Math.abs(ballVelocity.x) + 1;
+        if (ballVelocity.x > 12) {
+            speed = Math.abs(ballVelocity.x) - 1;
         } else {
             speed = Math.abs(ballVelocity.x);
         }
@@ -121,14 +124,38 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
         Rect rball = new Rect(b.getPointX(), b.getPointY(), b.getPointX() + b.getWidth(), b.getPointY() + b.getHeight());
 
         for (Rect r : foosmanboundsList) {
-            if (Math.abs(rball.left - r.left) < 25 || Math.abs(rball.right - r.right) < 25) {
-                collisionFromTopOrBottom = true;
+            if (rball.top < r.top) {
+                collisionFromTop = true;
+                collisionFromBottom = false;
+            } else if (rball.bottom > r.bottom) {
+                collisionFromBottom = true;
+                collisionFromTop = false;
             } else {
-                collisionFromTopOrBottom = false;
+                collisionFromTop = false;
+                collisionFromBottom = false;
             }
+
+            if (rball.left < r.left) {
+                collisionFromLeft = true;
+                collisionFromRight = false;
+            } else if (rball.right > r.right) {
+                collisionFromRight = true;
+                collisionFromLeft = false;
+            } else {
+                collisionFromLeft = false;
+                collisionFromRight = false;
+            }
+
+//            if (Math.abs(rball.left - r.left) < 35 || Math.abs(rball.right - r.right) < 35) {
+//                collisionFromTopOrBottom = true;
+//            } else {
+//                collisionFromTopOrBottom = false;
+//            }
             Rect r3 = rball;
 
             if (rball.intersect(r)) {
+                Log.i("ball", String.format("%d, %d, %d, %d", rball.top, rball.bottom, rball.left, rball.right));
+                Log.i("foosman", String.format("%d, %d, %d, %d", rball.top, rball.bottom, rball.left, rball.right));
                 for (int i = rball.left; i < rball.right; i++) {
                     for (int j = rball.top; j < rball.bottom; j++) {
                         if (bmBall.getPixel(i - r3.left, j - r3.top) != Color.TRANSPARENT) {
@@ -144,18 +171,33 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
     }
 
     private void handleCollision() {
-        if (hasCollided && collisionFromTopOrBottom) {
-            ballVelocity.x *= 1.1;
-            ballVelocity.y *= 1.1;
-            ballVelocity.y *= -1;
-            collisionFromTopOrBottom = false;
-            hasCollided = false;
-        } else if (hasCollided) {
-            ballVelocity.x *= 1.1;
-            ballVelocity.y *= 1.1;
-            ballVelocity.x *= -1;
-            hasCollided = false;
+        ballVelocity.x *= 1.1;
+        ballVelocity.y *= 1.1;
+        if (collisionFromTop) {
+            ballVelocity.y = -Math.abs(ballVelocity.y);
+            collisionFromTop = false;
+        } else if (collisionFromBottom) {
+            ballVelocity.y = Math.abs(ballVelocity.y);
+            collisionFromBottom = false;
         }
+        if (collisionFromLeft) {
+            ballVelocity.x = -Math.abs(ballVelocity.x);
+            collisionFromLeft = false;
+        } else if (collisionFromRight) {
+            ballVelocity.x = Math.abs(ballVelocity.x);
+            collisionFromRight = false;
+        }
+//        if (hasCollided && collisionFromTop) {
+////            ballVelocity.x *= 1.1;
+////            ballVelocity.y *= 1.1;
+//
+//            hasCollided = false;
+//        } else if (hasCollided && !collisionFromTop) {
+////            ballVelocity.x *= 1.1;
+////            ballVelocity.y *= 1.1;
+//            ballVelocity.x *= -1;
+//            hasCollided = false;
+//        }
     }
 
     /**
@@ -303,7 +345,7 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
         gameBoard.goalA.setPoint(pTeamAGoal.x, pTeamAGoal.y);
         gameBoard.goalB.setPoint(pTeamBGoal.x, pTeamBGoal.y);
 
-        ballVelocity = new Point(6, -2);
+        ballVelocity = new Point(10, -2);
 
         ballMaxX = gameBoard.getWidth() - gameBoard.b.getWidth();
         ballMaxY = gameBoard.getHeight() - gameBoard.b.getHeight();
@@ -322,8 +364,9 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
             frame.removeCallbacks(frameUpdate);
 
 
-            hasCollided = checkCollision(gameBoard.b, foosmanList);
-            handleCollision();
+            if (checkCollision(gameBoard.b, foosmanList)) {
+                handleCollision();
+            }
             moveFoosman();
             updateVelocity();
 
