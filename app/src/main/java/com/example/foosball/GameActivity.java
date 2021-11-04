@@ -141,8 +141,12 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
     }
 
     private void handleCollision() {
-        ballVelocity.x *= 1.1;
-        ballVelocity.y *= 1.1;
+        if (ballVelocity.x < 20) {
+            ballVelocity.x *= 1.1;
+        }
+        if (ballVelocity.y < 20) {
+            ballVelocity.y *= 1.1;
+        }
         if (collisionFromTop) {
             ballVelocity.y = -Math.abs(ballVelocity.y);
             collisionFromTop = false;
