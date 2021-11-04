@@ -19,7 +19,7 @@ import java.util.ArrayList;
 public class LobbyActivity extends FullScreenActivity {
 
     /**
-     * Stores the player 1 - 4 text views in an array list
+     * Stores the player 1 - 2 text views in an array list
      *
      * @return array list of the text views in activity_lobby.xml
      */
@@ -28,8 +28,6 @@ public class LobbyActivity extends FullScreenActivity {
         ArrayList<TextView> playerTextViews = new ArrayList<>();
         playerTextViews.add(findViewById(R.id.player1Text));
         playerTextViews.add(findViewById(R.id.player2Text));
-        playerTextViews.add(findViewById(R.id.player3Text));
-        playerTextViews.add(findViewById(R.id.player4Text));
 
         return playerTextViews;
     }
@@ -69,12 +67,12 @@ public class LobbyActivity extends FullScreenActivity {
              * depending on whether the current player is player1 "i.e. host"
              *
              * @param playerNames List of player names.
-             * @param evenPlayers Whether there is an even number of players.
+             * @param twoPlayers Whether there is an even number of players.
              * @param gameStarted Whether the game has started.
              * @param gameEnded Whether the game has ended.
              */
             @Override
-            public void onSuccess(ArrayList<String> playerNames, Boolean evenPlayers,
+            public void onSuccess(ArrayList<String> playerNames, Boolean twoPlayers,
                                   Boolean gameStarted, Boolean gameEnded) {
                 ArrayList<TextView> playerTextViews = getPlayerTextViews();
 
@@ -88,8 +86,8 @@ public class LobbyActivity extends FullScreenActivity {
                     }
                 }
 
-                // If there are 2 or 4 players and host, then make start button visible
-                if (Utils.isGameHost(getApplicationContext()) && evenPlayers
+                // If there are 2 players and host, then make start button visible
+                if (Utils.isGameHost(getApplicationContext()) && twoPlayers
                         && !gameStarted && !gameEnded) {
                     startGameButton.setVisibility(View.VISIBLE);
                 } else {

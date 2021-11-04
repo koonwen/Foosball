@@ -20,7 +20,7 @@ import java.util.HashMap;
 public class Database {
     private static Database singleInstance = null;
     private static final String TAG = "Database";
-    private static final int[] PLAYER_IDS = {1, 2, 3, 4};
+    private static final int[] PLAYER_IDS = {1, 2};
     private static final String DATABASE_PATH = "games";
     private static final String KEY_HAS_GAME_STARTED = "hasGameStarted";
     private static final String KEY_HAS_GAME_ENDED = "hasGameEnded";
@@ -186,7 +186,7 @@ public class Database {
     /**
      * Removes player name from the relevant game in the db
      *
-     * @param playerId Whether the player to be removed is the 1st, 2nd, 3rd or 4th player in the lobby
+     * @param playerId Whether the player to be removed is the 1st or 2nd  player in the lobby
      * @param basicDatabaseListener @see BasicDatabaseListener
      */
     public void removePlayer(int playerId, BasicDatabaseListener basicDatabaseListener) {
@@ -294,10 +294,10 @@ public class Database {
 
                 Boolean gameStarted = (Boolean) dataSnapshot.child(KEY_HAS_GAME_STARTED).getValue();
                 Boolean gameEnded = (Boolean) dataSnapshot.child(KEY_HAS_GAME_ENDED).getValue();
-                Boolean evenPlayers = numPlayers % 2 == 0;
+                Boolean twoPlayers = numPlayers % 2 == 0;
 
                 gameStatusListener.onSuccess(playerNames,
-                        evenPlayers, gameStarted, gameEnded);
+                        twoPlayers, gameStarted, gameEnded);
             }
 
             @Override
@@ -334,7 +334,7 @@ public class Database {
     /**
      * Returns a formatted string of "player1", "player2", "player3", or "player4" depending on ID
      *
-     * @param playerId Any int between 1 - 4
+     * @param playerId Any int between 1 - 2
      * @return Formatted string with player key
      */
     private String getPlayerKey(int playerId) {

@@ -69,24 +69,6 @@
                 android:padding="6dp"
                 android:text="@string/placeholder_player_name" />
 
-            <TextView
-                android:id="@+id/player3Text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="6dp"
-                android:background="@drawable/border"
-                android:padding="6dp"
-                android:text="@string/placeholder_player_name" />
-
-            <TextView
-                android:id="@+id/player4Text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="6dp"
-                android:background="@drawable/border"
-                android:padding="6dp"
-                android:text="@string/placeholder_player_name" />
-
             <Button
                 android:id="@+id/returnMenu"
                 android:layout_width="match_parent"
