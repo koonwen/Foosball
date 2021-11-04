@@ -109,7 +109,7 @@ public class Ball implements BoardItem {
 
     @Override
     public int getPointY() {
-        return 0;
+        return this.point.y;
     }
 
     /**

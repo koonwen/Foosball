@@ -373,8 +373,7 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
             if (gameBoard.goalB.getConceeded() >= 3 || gameBoard.goalA.getConceeded() >= 3) {
                 endGame(findViewById(R.id.the_canvas));
                 return;
-            }
-            ;
+            };
 
             frame.removeCallbacks(frameUpdate);
 
