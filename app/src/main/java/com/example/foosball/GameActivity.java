@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
-import android.widget.ImageButton;
 
 import com.example.foosball.database.Database;
 import com.example.foosball.database.GameDataListener;
@@ -30,16 +29,12 @@ import java.util.Random;
  * This acts as an Game Engine. It initiates the positions of all elements including the ball
  * and foosmen and also handles the movement of the elements for every frame.
  */
-
 public class GameActivity extends FullScreenActivity implements OnTouchListener {
 
     private final Handler frame = new Handler();
     private Point ballVelocity;
     private int ballMaxY;
     private int ballMaxX;
-
-    // acceleration flag
-    private final boolean isAccelerating = false;
 
     private boolean collisionFromTop = false;
     private boolean collisionFromLeft = false;
@@ -49,33 +44,13 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
     private boolean downButtonDown = false;
     private static final int FPS = 50;
     private static final int FRAME_RATE = 1000 / FPS;
-    private String gameCode;
     private boolean isGameHost;
     private final List<String> foosmanNames = Arrays.asList("TeamAGoalie", "TeamADefender1",
             "TeamADefender2", "TeamAAttacker1", "TeamAAttacker2", "TeamAAttacker3", "TeamBGoalie",
             "TeamBDefender1", "TeamBDefender2", "TeamBAttacker1", "TeamBAttacker2", "TeamBAttacker3");
-    private final List<String> foosmanNamesTeamA = Arrays.asList("TeamAGoalie", "TeamADefender1",
-            "TeamADefender2", "TeamAAttacker1", "TeamAAttacker2", "TeamAAttacker3");
-    private final List<Foosman> foosmanList = new ArrayList<Foosman>();
+    private final List<Foosman> foosmanList = new ArrayList<>();
     private GameBoard gameBoard;
     private static final Database database = Database.getInstance();
-
-    //Method for getting touch state--requires android 2.1 or greater
-    //    @Override
-    //    synchronized public boolean onTouchEvent(MotionEvent ev) {
-    //        final int action = ev.getAction();
-    //        switch (action & MotionEvent.ACTION_MASK) {
-    //            case MotionEvent.ACTION_DOWN:
-    //            case MotionEvent.ACTION_POINTER_DOWN:
-    //                isAccelerating = true;
-    //                break;
-    //            case MotionEvent.ACTION_UP:
-    //            case MotionEvent.ACTION_POINTER_UP:
-    //                isAccelerating = false;
-    //                break;
-    //        }
-    //        return true;
-    //    }
 
     /**
      * Increase the velocity towards seven or
@@ -85,7 +60,7 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
     private void updateVelocity() {
         int xDir = (ballVelocity.x > 0) ? 1 : -1;
         int yDir = (ballVelocity.y > 0) ? 1 : -1;
-        int speed = 0;
+        int speed;
         if (ballVelocity.x > 12) {
             speed = Math.abs(ballVelocity.x) - 1;
         } else {
@@ -114,7 +89,7 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
         int bmWidth = bmTeamA.getWidth();
         int bmHeight = bmTeamA.getHeight();
 
-        List<Rect> foosmanboundsList = new ArrayList<Rect>();
+        List<Rect> foosmanboundsList = new ArrayList<>();
 
         for (Foosman foosman : foosmanList) {
             int foosmanPointX = foosman.getPointX();
@@ -148,19 +123,12 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
                 collisionFromRight = false;
             }
 
-//            if (Math.abs(rball.left - r.left) < 35 || Math.abs(rball.right - r.right) < 35) {
-//                collisionFromTopOrBottom = true;
-//            } else {
-//                collisionFromTopOrBottom = false;
-//            }
-            Rect r3 = rball;
-
             if (rball.intersect(r)) {
                 Log.i("ball", String.format("%d, %d, %d, %d", rball.top, rball.bottom, rball.left, rball.right));
                 Log.i("foosman", String.format("%d, %d, %d, %d", rball.top, rball.bottom, rball.left, rball.right));
                 for (int i = rball.left; i < rball.right; i++) {
                     for (int j = rball.top; j < rball.bottom; j++) {
-                        if (bmBall.getPixel(i - r3.left, j - r3.top) != Color.TRANSPARENT) {
+                        if (bmBall.getPixel(i - rball.left, j - rball.top) != Color.TRANSPARENT) {
                             if (bmTeamA.getPixel(i - r.left, j - r.top) != Color.TRANSPARENT || bmTeamB.getPixel(i - r.left, j - r.top) != Color.TRANSPARENT) {
                                 return true;
                             }
@@ -189,17 +157,6 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
             ballVelocity.x = Math.abs(ballVelocity.x);
             collisionFromRight = false;
         }
-//        if (hasCollided && collisionFromTop) {
-////            ballVelocity.x *= 1.1;
-////            ballVelocity.y *= 1.1;
-//
-//            hasCollided = false;
-//        } else if (hasCollided && !collisionFromTop) {
-////            ballVelocity.x *= 1.1;
-////            ballVelocity.y *= 1.1;
-//            ballVelocity.x *= -1;
-//            hasCollided = false;
-//        }
     }
 
     /**
@@ -243,10 +200,11 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
         Handler h = new Handler();
-        ((ImageButton) findViewById(R.id.up_button)).setOnTouchListener(this);
-        ((ImageButton) findViewById(R.id.down_button)).setOnTouchListener(new OnTouchListener() {
+        findViewById(R.id.up_button).setOnTouchListener(this);
+        findViewById(R.id.down_button).setOnTouchListener(new OnTouchListener() {
             @Override
             synchronized public boolean onTouch(View view, MotionEvent event) {
+                view.performClick();
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         downButtonDown = true;
@@ -261,15 +219,9 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
                 return true;
             }
         });
-        h.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                initGfx();
-            }
-        }, 1000);
-        gameCode = Utils.getGameCode(getApplicationContext());
+        h.postDelayed(this::initGfx, 10);
         isGameHost = Utils.isGameHost(getApplicationContext());
-        gameBoard = (GameBoard) findViewById(R.id.the_canvas);
+        gameBoard = findViewById(R.id.the_canvas);
         database.startGameDataListener(new GameDataListener() {
             @Override
             public void onSuccess(int x, int y, int vx, int vy, int fya, int fyb) {
@@ -349,8 +301,8 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
 
         ballMaxX = gameBoard.getWidth() - gameBoard.b.getWidth();
         ballMaxY = gameBoard.getHeight() - gameBoard.b.getHeight();
-        ((ImageButton) findViewById(R.id.up_button)).setEnabled(true);
-        ((ImageButton) findViewById(R.id.down_button)).setEnabled(true);
+        findViewById(R.id.up_button).setEnabled(true);
+        findViewById(R.id.down_button).setEnabled(true);
         frame.removeCallbacks(frameUpdate);
         gameBoard.invalidate(); // marks the canvas as outdated - so it will be updated on next frame
         frame.postDelayed(frameUpdate, FRAME_RATE);
@@ -416,6 +368,7 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
 
     @Override
     synchronized public boolean onTouch(View view, MotionEvent event) {
+        view.performClick();
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 upButtonDown = true;
