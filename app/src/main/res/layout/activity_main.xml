@@ -5,6 +5,7 @@
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#130d1e"
     tools:context=".MainActivity">
 
     <LinearLayout
@@ -18,46 +19,68 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/textView"
+        <ImageView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/game_title"
-            android:textAlignment="center"
-            android:textSize="48sp" />
+            android:adjustViewBounds="true"
+            android:maxWidth="60dp"
+            android:maxHeight="60dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/lobbymain" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:maxWidth="100dp"
+            android:maxHeight="100dp"
+            android:layout_marginTop="10dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/titletext" />
 
         <EditText
             android:id="@+id/playerName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:backgroundTint="#FFFFFF"
             android:ems="10"
             android:hint="Player name"
             android:imeOptions="actionDone|flagNoExtractUi"
             android:importantForAutofill="no"
             android:inputType="textPersonName"
-            android:minHeight="48dp" />
+            android:minHeight="48dp"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#acacac"
+            android:textSize="14sp" />
 
         <Button
             android:id="@+id/createGame"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:backgroundTint="#254794"
             android:text="Create Game" />
 
         <EditText
             android:id="@+id/gameCode"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:backgroundTint="#FFFFFF"
             android:ems="10"
+            android:foregroundTint="#FFFFFF"
             android:hint="Enter code"
-            android:inputType="textCapCharacters|textNoSuggestions"
             android:imeOptions="actionDone|flagNoExtractUi"
             android:importantForAutofill="no"
-            android:minHeight="48dp" />
+            android:inputType="textCapCharacters|textNoSuggestions"
+            android:minHeight="48dp"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#acacac"
+            android:textSize="14sp" />
 
         <Button
             android:id="@+id/joinGame"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:backgroundTint="#254794"
             android:text="Join Game" />
 
     </LinearLayout>

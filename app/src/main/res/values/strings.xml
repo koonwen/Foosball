@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">Foosball</string>
     <string name="game_title">FOOSBALL</string>
-    <string name="placeholder_player_name">waiting for player…</string>
+    <string name="placeholder_player_name">Waiting for player…</string>
 </resources>
