@@ -43,11 +43,16 @@ TODO:
 1. To clean up Gameboard class and set up Foosman class to generate the foosmen on the layout instead.
 2. Plan collision detection implementation for ball with any foosman.
 
+## 8 October 2021
+### Implement game engine
+*Update by: Eddie & Koon*
+
 ## 10 October 2021
 ### Add networking functionality to create game and join game buttons in menu
 *Update by: Bernard and Tristan*
 1. Create game button creates a new database entry
 2. Join game button checks for existing db entry by game code and adds player id to db entry
+3. Implement basic multiplayer functionality (synchronise ball position)
 
 TODO:
 1. Handle logic for player1 as the "host" (all updates to the game to be handled through player1 to prevent concurrency issues)
@@ -64,15 +69,45 @@ TODO:
 2. Refactor GameActivity to use Ball class
 
 ## 12 October 2021
-### Add functionality to pull player names from db to update playerTextViews in Lobby Activity
 *Update by: Tristan*
+1. Add functionality to pull player names from db to update playerTextViews in Lobby Activity
 
 ### 12 October 2021
 *Update by Koon*
 1. Modularize Ball class
 2. Create interface for BoardItems
 
+### 14 October 2021
+*Update by Eddie & Koon*
+1. Add control buttons
+
+### 17 October 2021
+*Update by Bernard & Tristan*
+1. Improve lobby screen - real time update of players and start game button only visible to host
+
+### 27 October 2021
+*Update by Bernard & Tristan*
+1. Fix multiplayer functionality (synchronise ball position)
+
 ### 28 October 2021
 *Update by Koon*
 1. Further modularization of board objects (Foosman and Background)
 2. Added FoosmanTeam class to encapsulate position info to send to the real-time database
+
+### 29 October 2021
+*Update by Tristan*
+1. Start adding JavaDocs for interfaces, classes and methods 
+
+### 2 November 2021
+*Update by Bernard and Tristan*
+1. Sync foosman positions with DB
+2. Add firebase authentication
+3. Add end game screen
+
+### 4 November 2021
+*Update by Tristan*
+1. Refactor lobby and menu screens to only allow 2 players
+
+### 4 November 2021
+*Update by Eddie & Koon*
+1. Add goal and scoring functionality
