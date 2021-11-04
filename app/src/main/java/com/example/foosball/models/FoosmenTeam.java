@@ -6,15 +6,27 @@ import com.example.foosball.database.Database;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+/**
+ * Class that references all the individual Foosmen per team
+ */
+
 public class FoosmenTeam {
     private ArrayList<Foosman> playerList = new ArrayList<Foosman>(5);
     private ArrayList<Integer> relativePos = new ArrayList<Integer>(5);
     private int yCord;
 
+    /**
+     * Sets the y coordinates of the foosmen team to the given ycord
+     * @param yCord Absolute y coordinates
+     */
     public FoosmenTeam(int yCord) {
         this.yCord = yCord;
     }
 
+    /**
+     * Adds a Foosman to the team player list
+     * @param player New foosman player
+     */
     public void addPlayer(Foosman player) {
         this.playerList.add(player);
     }
@@ -31,11 +43,21 @@ public class FoosmenTeam {
         }
     }
 
+    /**
+     * Updates the yCord attribute after moving the foosmen team by the difference between
+     * the old and new yCords
+     * @param yCord Integer, new absolute y coordinates.
+     */
     public void setYCord(int yCord) {
         final int y = yCord - this.yCord;
         moveFoosmen(y);
         this.yCord = yCord;
     }
+
+    /**
+     * Returns the current y cord of the team
+     * @return Integer absolute y coordinates
+     */
 
     public int getYCord() {
         return this.yCord;
@@ -55,6 +77,10 @@ public class FoosmenTeam {
         }
     }
 
+    /**
+     * Move all players in the Foosman Team
+     * @param y Relative y coordinates to move the team by
+     */
     public void movePlayers(int y) {
         moveFoosmen(y);
         yCord += y;
