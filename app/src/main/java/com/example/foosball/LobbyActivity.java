@@ -95,6 +95,7 @@ public class LobbyActivity extends FullScreenActivity {
                 } else {
                     startGameButton.setVisibility(View.GONE);
                 }
+                startGameButton.setVisibility(View.VISIBLE);
 
                 // Automatically start game for rest of players once host has started game
                 if (!Utils.isGameHost(getApplicationContext()) && gameStarted && !gameEnded) {
