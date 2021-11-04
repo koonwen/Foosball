@@ -14,13 +14,12 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.ImageButton;
 
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-
-import com.example.foosball.database.CoordsListener;
 import com.example.foosball.database.Database;
+import com.example.foosball.database.GameDataListener;
 import com.example.foosball.drawing.GameBoard;
 import com.example.foosball.models.Ball;
 import com.example.foosball.models.Foosman;
+import com.example.foosball.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -242,7 +241,7 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        setContentView(R.layout.activity_game);
         Handler h = new Handler();
         ((ImageButton) findViewById(R.id.up_button)).setOnTouchListener(this);
         ((ImageButton) findViewById(R.id.down_button)).setOnTouchListener(new OnTouchListener() {
@@ -271,7 +270,7 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
         gameCode = Utils.getGameCode(getApplicationContext());
         isGameHost = Utils.isGameHost(getApplicationContext());
         gameBoard = (GameBoard) findViewById(R.id.the_canvas);
-        database.getCoords(new CoordsListener() {
+        database.startGameDataListener(new GameDataListener() {
             @Override
             public void onSuccess(int x, int y, int vx, int vy, int fya, int fyb) {
 
@@ -373,7 +372,7 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
             if (gameBoard.goalB.getConceeded() >= 3 || gameBoard.goalA.getConceeded() >= 3) {
                 endGame(findViewById(R.id.the_canvas));
                 return;
-            };
+            }
 
             frame.removeCallbacks(frameUpdate);
 
