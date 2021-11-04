@@ -389,9 +389,11 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
             ball.x = ball.x + ballVelocity.x;
             if (ball.x > ballMaxX || ball.x < 5) {
               if (ball.x > ballMaxX) {
-                  gameBoard.goalB.checkGoal(ball.y, findViewById(R.id.the_canvas));
+                  if (gameBoard.goalB.checkGoal(ball.y, findViewById(R.id.the_canvas)))
+                      gameBoard.b.setPoint((int) (gameBoard.getWidth() * 0.25), (int) (gameBoard.getHeight() * 0.75));
               } else {
-                  gameBoard.goalA.checkGoal(ball.y, findViewById(R.id.the_canvas));
+                  if (gameBoard.goalA.checkGoal(ball.y, findViewById(R.id.the_canvas)))
+                      gameBoard.b.setPoint((int) (gameBoard.getWidth() * 0.25), (int) (gameBoard.getHeight() * 0.75));
               }
                 ballVelocity.x *= -1;
             }
