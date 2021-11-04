@@ -45,7 +45,7 @@ public class LobbyActivity extends FullScreenActivity {
 
         // Sets the start game button as hidden by default
         final Button startGameButton = findViewById(R.id.startGame);
-        startGameButton.setVisibility(View.GONE);
+        startGameButton.setVisibility(View.INVISIBLE);
 
         final String gameCode = Utils.getGameCode(getApplicationContext());
         final TextView gameCodeText = findViewById(R.id.codeID);
@@ -90,7 +90,7 @@ public class LobbyActivity extends FullScreenActivity {
                 if (Utils.isGameHost(getApplicationContext()) && twoPlayers) {
                     startGameButton.setVisibility(View.VISIBLE);
                 } else {
-                    startGameButton.setVisibility(View.GONE);
+                    startGameButton.setVisibility(View.INVISIBLE);
                 }
                 // TODO: Remove line before production. Uncomment for testing game without needing
                 // a second player.

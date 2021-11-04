@@ -9,7 +9,7 @@
     <string name="join_game">Join Game</string>
     <string name="graphic_logo">Graphic logo</string>
     <string name="lobby">LOBBY</string>
-    <string name="code">CODE:</string>
+    <string name="code">CODE: </string>
     <string name="to_add">TO_ADD</string>
     <string name="return_to_menu">RETURN TO MENU</string>
     <string name="start_game">START GAME</string>
