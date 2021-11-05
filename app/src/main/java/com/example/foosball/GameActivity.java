@@ -35,13 +35,10 @@ public class GameActivity extends FullScreenActivity {
     private Point ballVelocity;
     private int ballMaxY;
     private int ballMaxX;
-    private int ballWidth;
-    private int ballHeight;
     private int foosmanWidth;
     private int foosmanHeight;
     private int canvasWidth;
     private int canvasHeight;
-
     private boolean collisionFromTop = false;
     private boolean collisionFromLeft = false;
     private boolean collisionFromRight = false;
@@ -60,10 +57,10 @@ public class GameActivity extends FullScreenActivity {
     private static final Database database = Database.getInstance();
 
     /**
-     * Increase the velocity towards seven or
-     * and hold steady afterwards
+     * This method updates the velocity of the ball.
+     * It gradually increases the velocity of the ball towards 12
+     * and holds steady afterwards.
      */
-
     private void updateVelocity() {
         int xDir = (ballVelocity.x > 0) ? 1 : -1;
         int yDir = (ballVelocity.y > 0) ? 1 : -1;
@@ -71,43 +68,32 @@ public class GameActivity extends FullScreenActivity {
         if (ballVelocity.x > 12) {
             speed = Math.abs(ballVelocity.x) - 1;
         } else {
-            speed = Math.abs(ballVelocity.x);
+            speed = Math.abs(ballVelocity.x) + 1;
         }
         ballVelocity.x = speed * xDir;
         ballVelocity.y = speed * yDir;
-        //        int speed = 0;
-        //        if (isAccelerating) {
-        //            speed = Math.abs(ballVelocity.x)+1;
-        //        } else {
-        //            speed = Math.abs(ballVelocity.x)-1;
-        //        }
-        //        if (speed>8) speed =8;
-        //        if (speed<1) speed =1;
-        //        ballVelocity.x=speed*xDir;
-        //        ballVelocity.y=speed*yDir;
     }
 
     /**
      * Checks if there is a collision between the ball and any foosmen
-     * Collision model for foosman and ball are rectangles
+     * Bounds are drew around each foosman at their present position and
+     * the ball. If the bounds intersect, then their bitmaps are checked
+     * to find a pixel that overlaps for more precision.
      * @param b Ball
      * @param foosmanList List of foosmen
      * @return Boolean if there is a detected collision
      */
     private boolean checkCollision(Ball b, List<Foosman> foosmanList) {
-
         Bitmap bmTeamA = BitmapFactory.decodeResource(getResources(), R.drawable.ship1);
         Bitmap bmTeamB = BitmapFactory.decodeResource(getResources(), R.drawable.ship2);
         Bitmap bmBall = BitmapFactory.decodeResource(getResources(), R.drawable.ball);
-        int bmWidth = bmTeamA.getWidth();
-        int bmHeight = bmTeamA.getHeight();
 
         List<Rect> foosmanboundsList = new ArrayList<>();
 
         for (Foosman foosman : foosmanList) {
             int foosmanPointX = foosman.getPointX();
             int foosmanPointY = foosman.getPointY();
-            Rect r = new Rect(foosmanPointX, foosmanPointY, foosmanPointX + bmWidth, foosmanPointY + bmHeight);
+            Rect r = new Rect(foosmanPointX, foosmanPointY, foosmanPointX + foosmanWidth, foosmanPointY + foosmanHeight);
             foosmanboundsList.add(r);
         }
 
@@ -137,8 +123,6 @@ public class GameActivity extends FullScreenActivity {
             }
 
             if (rball.intersect(r)) {
-                Log.i("ball", String.format("%d, %d, %d, %d", rball.top, rball.bottom, rball.left, rball.right));
-                Log.i("foosman", String.format("%d, %d, %d, %d", rball.top, rball.bottom, rball.left, rball.right));
                 for (int i = rball.left; i < rball.right; i++) {
                     for (int j = rball.top; j < rball.bottom; j++) {
                         if (bmBall.getPixel(i - rball.left, j - rball.top) != Color.TRANSPARENT) {
@@ -269,9 +253,7 @@ public class GameActivity extends FullScreenActivity {
         isGameHost = Utils.isGameHost(getApplicationContext());
         gameBoard = findViewById(R.id.the_canvas);
 
-        /**
-         * Pulls ball and foosmen positions from the db
-         */
+        // Pulls ball and foosmen positions from the db
         database.startGameDataListener(new GameDataListener() {
             @Override
             public void onSuccess(int x, int y, int vx, int vy, int fya, int fyb) {
@@ -315,8 +297,8 @@ public class GameActivity extends FullScreenActivity {
         // Initialise widths and heights
         canvasWidth = gameBoard.getWidth();
         canvasHeight = gameBoard.getHeight();
-        ballWidth = gameBoard.b.getWidth();
-        ballHeight = gameBoard.b.getWidth();
+        int ballWidth = gameBoard.b.getWidth();
+        int ballHeight = gameBoard.b.getWidth();
         foosmanWidth = gameBoard.getFoosman("TeamAGoalie").getWidth();
         foosmanHeight = gameBoard.getFoosman("TeamAGoalie").getHeight();
 
@@ -384,9 +366,7 @@ public class GameActivity extends FullScreenActivity {
         @Override
         synchronized public void run() {
 
-            /**
-             * Check if goals conceded is more than 3.
-             */
+            // Check if goals conceded is more than 3.
             if (gameBoard.goalB.getConceeded() >= 3 || gameBoard.goalA.getConceeded() >= 3) {
                 endGame(findViewById(R.id.the_canvas));
                 return;
