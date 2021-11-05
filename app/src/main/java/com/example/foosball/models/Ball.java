@@ -14,13 +14,14 @@ public class Ball implements BoardItem {
 
     private Point point = new Point(-1, -1);
     private int ballRotation = 0;
+    private boolean shouldRotate = false;
     private boolean collisionDetected = false;
     private Point lastCollision;
 
-    private Rect bounds;
-    private Bitmap bm;
+    private final Rect bounds;
+    private final Bitmap bm;
 
-    private Matrix mball = new Matrix();
+    private final Matrix mball = new Matrix();
 
     public Ball(Bitmap bm) {
         this.bm = bm;
@@ -113,6 +114,7 @@ public class Ball implements BoardItem {
 
     /**
      * Getter for the width of the ball object bounds
+     *
      * @return ball object bound width
      */
     @Override
@@ -130,12 +132,22 @@ public class Ball implements BoardItem {
         return bounds.height();
     }
 
+    public void startRotation() {
+        shouldRotate = true;
+    }
+
+    public void stopRotation() {
+        shouldRotate = false;
+    }
+
     public void refresh(Canvas canvas) {
         if (point.x > 0) {
             mball.reset();
             mball.postTranslate((float) (point.x), (float) (point.y));
             mball.postRotate(ballRotation, (float) (point.x + bounds.width() / 2.0), (float) (point.y + bounds.width() / 2.0));
-            ballRotation = (ballRotation + 5) % 360;
+            if (shouldRotate) {
+                ballRotation = (ballRotation + 5) % 360;
+            }
         }
         canvas.drawBitmap(bm, mball, null);
     }
