@@ -29,12 +29,18 @@ import java.util.Random;
  * This acts as an Game Engine. It initiates the positions of all elements including the ball
  * and foosmen and also handles the movement of the elements for every frame.
  */
-public class GameActivity extends FullScreenActivity implements OnTouchListener {
+public class GameActivity extends FullScreenActivity {
 
     private final Handler frame = new Handler();
     private Point ballVelocity;
     private int ballMaxY;
     private int ballMaxX;
+    private int ballWidth;
+    private int ballHeight;
+    private int foosmanWidth;
+    private int foosmanHeight;
+    private int canvasWidth;
+    private int canvasHeight;
 
     private boolean collisionFromTop = false;
     private boolean collisionFromLeft = false;
@@ -44,6 +50,7 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
     private boolean downButtonDown = false;
     private static final int FPS = 50;
     private static final int FRAME_RATE = 1000 / FPS;
+    private static final int foosmanSensitivity = 5;
     private boolean isGameHost;
     private final List<String> foosmanNames = Arrays.asList("TeamAGoalie", "TeamADefender1",
             "TeamADefender2", "TeamAAttacker1", "TeamAAttacker2", "TeamAAttacker3", "TeamBGoalie",
@@ -178,31 +185,30 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
      * It checks if `upButtonDown` or `downButtonDown` are true and then checks if the
      * foosmen closest to the canvas top and bottom edges are within a distance of 50.
      *
-     * If false, it specifies a new position for each foosmen by 5 in the Y-direction.
+     * If false, it specifies a new position for each foosmen by the value defined by
+     * `foosmanSensitivity` in the Y-direction.
      */
     private void moveFoosman() {
-        int canvasHeight = gameBoard.getHeight();
-
         if (isGameHost) {
             if (downButtonDown) {
-                if (gameBoard.getFoosman("TeamAAttacker1").getPointY() < (canvasHeight - 150)) {
-                    gameBoard.teamA.movePlayers(5);
+                if (gameBoard.getFoosman("TeamAAttacker1").getPointY() < (canvasHeight - foosmanHeight)) {
+                    gameBoard.teamA.movePlayers(foosmanSensitivity);
                 }
             }
             if (upButtonDown) {
-                if (gameBoard.getFoosman("TeamAAttacker3").getPointY() > 50) {
-                    gameBoard.teamA.movePlayers(-5);
+                if (gameBoard.getFoosman("TeamAAttacker3").getPointY() > 0) {
+                    gameBoard.teamA.movePlayers(-foosmanSensitivity);
                 }
             }
         } else {
             if (downButtonDown) {
-                if (gameBoard.getFoosman("TeamBAttacker1").getPointY() < (canvasHeight - 150)) {
-                    gameBoard.teamB.movePlayers(5);
+                if (gameBoard.getFoosman("TeamBAttacker1").getPointY() < (canvasHeight - foosmanHeight)) {
+                    gameBoard.teamB.movePlayers(foosmanSensitivity);
                 }
             }
             if (upButtonDown) {
-                if (gameBoard.getFoosman("TeamBAttacker3").getPointY() > 50) {
-                    gameBoard.teamB.movePlayers(-5);
+                if (gameBoard.getFoosman("TeamBAttacker3").getPointY() > 0) {
+                    gameBoard.teamB.movePlayers(-foosmanSensitivity);
                 }
             }
         }
@@ -223,7 +229,24 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
         /**
          * Handles touch controls for up and down buttons
          */
-        findViewById(R.id.up_button).setOnTouchListener(this);
+        findViewById(R.id.up_button).setOnTouchListener(new OnTouchListener() {
+            @Override
+            synchronized public boolean onTouch(View view, MotionEvent event) {
+                view.performClick();
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        upButtonDown = true;
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        upButtonDown = false;
+                        break;
+                    default:
+                        break;
+                }
+
+                return true;
+            }
+        });
         findViewById(R.id.down_button).setOnTouchListener(new OnTouchListener() {
             @Override
             synchronized public boolean onTouch(View view, MotionEvent event) {
@@ -289,9 +312,13 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
         Point pBall, pTeamAGoalie, pTeamADefender1, pTeamADefender2, pTeamAAttacker1, pTeamAAttacker2, pTeamAAttacker3,
                 pTeamBGoalie, pTeamBDefender1, pTeamBDefender2, pTeamBAttacker1, pTeamBAttacker2, pTeamBAttacker3;
 
-        // Generate Positions
-        int canvasWidth = gameBoard.getWidth();
-        int canvasHeight = gameBoard.getHeight();
+        // Initialise widths and heights
+        canvasWidth = gameBoard.getWidth();
+        canvasHeight = gameBoard.getHeight();
+        ballWidth = gameBoard.b.getWidth();
+        ballHeight = gameBoard.b.getWidth();
+        foosmanWidth = gameBoard.getFoosman("TeamAGoalie").getWidth();
+        foosmanHeight = gameBoard.getFoosman("TeamAGoalie").getHeight();
 
         // Retrieve Foosmen
         for (String name : foosmanNames) {
@@ -329,8 +356,8 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
 
         ballVelocity = new Point(10, -2);
 
-        ballMaxX = gameBoard.getWidth() - gameBoard.b.getWidth();
-        ballMaxY = gameBoard.getHeight() - gameBoard.b.getHeight();
+        ballMaxX = canvasWidth - ballWidth;
+        ballMaxY = canvasHeight - ballHeight;
         findViewById(R.id.up_button).setEnabled(true);
         findViewById(R.id.down_button).setEnabled(true);
         frame.removeCallbacks(frameUpdate);
@@ -354,17 +381,18 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
      * sends host's ball position to db per frame.
      */
     private final Runnable frameUpdate = new Runnable() {
-
         @Override
         synchronized public void run() {
 
+            /**
+             * Check if goals conceded is more than 3.
+             */
             if (gameBoard.goalB.getConceeded() >= 3 || gameBoard.goalA.getConceeded() >= 3) {
                 endGame(findViewById(R.id.the_canvas));
                 return;
             }
 
             frame.removeCallbacks(frameUpdate);
-
 
             if (checkCollision(gameBoard.b, foosmanList)) {
                 handleCollision();
@@ -380,14 +408,14 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
             if (ball.x > ballMaxX || ball.x < 5) {
                 if (ball.x > ballMaxX) {
                     if (gameBoard.goalB.checkGoal(ball.y, findViewById(R.id.the_canvas))) {
-                        ball.x = (int) (gameBoard.getWidth() * 0.5);
-                        ball.y = (int) (gameBoard.getHeight() * 0.5);
+                        ball.x = (int) (canvasWidth * 0.5);
+                        ball.y = (int) (canvasHeight * 0.5);
 
                     }
                 } else {
                     if (gameBoard.goalA.checkGoal(ball.y, findViewById(R.id.the_canvas))) {
-                        ball.x = (int) (gameBoard.getWidth() * 0.5);
-                        ball.y = (int) (gameBoard.getHeight() * 0.5);
+                        ball.x = (int) (canvasWidth * 0.5);
+                        ball.y = (int) (canvasHeight * 0.5);
                     }
                 }
                 ballVelocity.x *= -1;
@@ -410,21 +438,4 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
         }
 
     };
-
-    @Override
-    synchronized public boolean onTouch(View view, MotionEvent event) {
-        view.performClick();
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                upButtonDown = true;
-                break;
-            case MotionEvent.ACTION_UP:
-                upButtonDown = false;
-                break;
-            default:
-                break;
-        }
-
-        return true;
-    }
 }
