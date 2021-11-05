@@ -24,6 +24,10 @@ public class Foosman implements BoardItem {
         this.bounds = new Rect(0, 0, bm.getWidth(), bm.getHeight());
     }
 
+    public Foosman(String name) {
+        this.name = name;
+    }
+
     /**
      * Set the location of the foosman
      * @param X
