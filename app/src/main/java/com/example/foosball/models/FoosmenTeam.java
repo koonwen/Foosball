@@ -8,8 +8,8 @@ import java.util.Iterator;
  */
 
 public class FoosmenTeam {
-    private final ArrayList<Foosman> playerList = new ArrayList<Foosman>(5);
-    private final ArrayList<Integer> relativePos = new ArrayList<Integer>(5);
+    private final ArrayList<Foosman> playerList = new ArrayList<>(5);
+    private final ArrayList<Integer> relativePos = new ArrayList<>(5);
     private int yCord;
 
     /**
@@ -35,9 +35,7 @@ public class FoosmenTeam {
      * relative positioning for the players in a team to the center point
      */
     public void fixRelativePos() {
-        Iterator<Foosman> iterPlayer = playerList.iterator();
-        while (iterPlayer.hasNext()) {
-            Foosman curFoosman = iterPlayer.next();
+        for (Foosman curFoosman : playerList) {
             relativePos.add(curFoosman.getPointY() - yCord);
         }
     }
