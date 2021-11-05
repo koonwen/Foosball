@@ -23,9 +23,9 @@ public class EndGameActivity extends FullScreenActivity {
             teamAConceeeded = extras.getInt("teamA");
             teamBConceeded = extras.getInt("teamB");
             if (teamAConceeeded > teamBConceeded) {
-                winner += "Team B!!!";
+                winner += "Team B!";
             } else {
-                winner += "Team A!!!";
+                winner += "Team A!";
             }
         }
         winner += "\nScore " + teamAConceeeded + " - " + teamBConceeded;
