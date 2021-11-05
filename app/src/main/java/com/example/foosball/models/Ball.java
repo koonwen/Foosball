@@ -27,6 +27,8 @@ public class Ball implements BoardItem {
         this.bounds = new Rect(0, 0, bm.getWidth(), bm.getHeight());
     }
 
+    public Ball(){}
+
     public Matrix getMball() {
         return mball;
     }
