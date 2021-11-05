@@ -1,5 +1,8 @@
 package com.example.foosball.models;
 
+/**
+ * Interface for the game board.
+ */
 interface BoardItem {
     void setPoint(int X, int Y);
 

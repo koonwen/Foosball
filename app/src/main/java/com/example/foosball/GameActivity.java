@@ -80,7 +80,13 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
         //        ballVelocity.y=speed*yDir;
     }
 
-
+    /**
+     * Checks if there is a collision between the ball and any foosmen
+     * Collision model for foosman and ball are rectangles
+     * @param b Ball
+     * @param foosmanList List of foosmen
+     * @return Boolean if there is a detected collision
+     */
     private boolean checkCollision(Ball b, List<Foosman> foosmanList) {
 
         Bitmap bmTeamA = BitmapFactory.decodeResource(getResources(), R.drawable.ship1);
@@ -140,6 +146,10 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
         return false;
     }
 
+    /**
+     * Changes direction and adds acceleration (in the opposite direction to collision)
+     * to ball if there is collision detected
+     */
     private void handleCollision() {
         if (ballVelocity.x < 20) {
             ballVelocity.x *= 1.1;
@@ -167,6 +177,7 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
      * This method is called when the user presses the 'Up' or 'Down' buttons on screen.
      * It checks if `upButtonDown` or `downButtonDown` are true and then checks if the
      * foosmen closest to the canvas top and bottom edges are within a distance of 50.
+     *
      * If false, it specifies a new position for each foosmen by 5 in the Y-direction.
      */
     private void moveFoosman() {
@@ -199,11 +210,19 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
     }
 
 
+    /**
+     * Starts the game activity
+     * @param savedInstanceState
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
         Handler h = new Handler();
+
+        /**
+         * Handles touch controls for up and down buttons
+         */
         findViewById(R.id.up_button).setOnTouchListener(this);
         findViewById(R.id.down_button).setOnTouchListener(new OnTouchListener() {
             @Override
@@ -226,6 +245,10 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
         h.postDelayed(this::initGfx, 10);
         isGameHost = Utils.isGameHost(getApplicationContext());
         gameBoard = findViewById(R.id.the_canvas);
+
+        /**
+         * Pulls ball and foosmen positions from the db
+         */
         database.startGameDataListener(new GameDataListener() {
             @Override
             public void onSuccess(int x, int y, int vx, int vy, int fya, int fyb) {
@@ -258,6 +281,9 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
         return new Point(x, y);
     }
 
+    /**
+     * Initialise graphics
+     */
     synchronized public void initGfx() {
         gameBoard.bg.resetStarField();
         Point pBall, pTeamAGoalie, pTeamADefender1, pTeamADefender2, pTeamAAttacker1, pTeamAAttacker2, pTeamAAttacker3,
@@ -312,6 +338,10 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
         frame.postDelayed(frameUpdate, FRAME_RATE);
     }
 
+    /**
+     * Starts the end game activity with the saved number of goals for each team
+     * @param view
+     */
     public void endGame(View view) {
         Intent intent = new Intent(this, EndGameActivity.class);
         intent.putExtra("teamA", gameBoard.goalA.getConceeded());
@@ -319,7 +349,10 @@ public class GameActivity extends FullScreenActivity implements OnTouchListener 
         startActivity(intent);
     }
 
-
+    /**
+     * Checks if greater than 3 goals are scored by any team, updates ball position on screen and
+     * sends host's ball position to db per frame.
+     */
     private final Runnable frameUpdate = new Runnable() {
 
         @Override

@@ -5,6 +5,10 @@ import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
 
+/**
+ * Class that handles the end game screen and displays the final score
+ * with an option to return to main menu
+ */
 public class EndGameActivity extends FullScreenActivity {
 
     @Override

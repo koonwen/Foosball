@@ -23,7 +23,7 @@ public class MainActivity extends FullScreenActivity {
     private static final String TAG = "MainActivity";
 
     /**
-     * Initialises main activity.
+     * Initialises main activity (main menu).
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {

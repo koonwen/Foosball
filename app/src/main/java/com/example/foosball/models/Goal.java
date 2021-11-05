@@ -15,6 +15,9 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.time.Duration;
 
+/**
+ * Handles the logic for the goals.
+ */
 public class Goal {
     private int topY;
     private int bottomY;

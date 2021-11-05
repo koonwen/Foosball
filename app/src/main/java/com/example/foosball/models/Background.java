@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Class handling the graphics for the game board's background
+ */
 public class Background {
 
     private List<Point> starField = null;
