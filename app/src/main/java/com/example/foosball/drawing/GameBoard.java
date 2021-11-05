@@ -44,8 +44,6 @@ public class GameBoard extends View {
     private final List<String> foosmanNames = Arrays.asList("TeamAGoalie", "TeamADefender1",
             "TeamADefender2", "TeamAAttacker1", "TeamAAttacker2", "TeamAAttacker3", "TeamBGoalie",
             "TeamBDefender1", "TeamBDefender2", "TeamBAttacker1", "TeamBAttacker2", "TeamBAttacker3");
-
-
     private final Map<String, Foosman> foosmanMap = new TreeMap<String, Foosman>();
 
     synchronized public Foosman getFoosman(String name) {
