@@ -18,8 +18,8 @@ public class Ball implements BoardItem {
     private boolean collisionDetected = false;
     private Point lastCollision;
 
-    private final Rect bounds;
-    private final Bitmap bm;
+    private Rect bounds;
+    private Bitmap bm;
 
     private final Matrix mball = new Matrix();
 
@@ -28,7 +28,8 @@ public class Ball implements BoardItem {
         this.bounds = new Rect(0, 0, bm.getWidth(), bm.getHeight());
     }
 
-    public Ball(){}
+    public Ball() {
+    }
 
     public Matrix getMball() {
         return mball;
