@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.widget.TextView;
 
 import com.example.foosball.database.Database;
 import com.example.foosball.database.GameDataListener;
@@ -24,6 +25,8 @@ import com.google.android.material.snackbar.Snackbar;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+import java.util.Random;
 
 /**
  * This acts as an Game Engine. It initiates the positions of all elements including the ball
@@ -47,7 +50,9 @@ public class GameActivity extends FullScreenActivity {
     private boolean downButtonDown = false;
     private static final int FPS = 50;
     private static final int FRAME_RATE = 1000 / FPS;
-    private static final int foosmanSensitivity = 5;
+    private static final int FOOSMAN_SENSITIVITY = 5;
+    private static final int INITIAL_SPEED_X = 12;
+    private static final int INITIAL_SPEED_Y = 8;
     private boolean isGameHost;
     private final List<String> foosmanNames = Arrays.asList("TeamAGoalie", "TeamADefender1",
             "TeamADefender2", "TeamAAttacker1", "TeamAAttacker2", "TeamAAttacker3", "TeamBGoalie",
@@ -182,23 +187,23 @@ public class GameActivity extends FullScreenActivity {
         if (isGameHost) {
             if (downButtonDown) {
                 if (gameBoard.getFoosman("TeamAAttacker1").getPointY() < (canvasHeight - foosmanHeight)) {
-                    gameBoard.teamA.movePlayers(foosmanSensitivity);
+                    gameBoard.teamA.movePlayers(FOOSMAN_SENSITIVITY);
                 }
             }
             if (upButtonDown) {
                 if (gameBoard.getFoosman("TeamAAttacker3").getPointY() > 0) {
-                    gameBoard.teamA.movePlayers(-foosmanSensitivity);
+                    gameBoard.teamA.movePlayers(-FOOSMAN_SENSITIVITY);
                 }
             }
         } else {
             if (downButtonDown) {
                 if (gameBoard.getFoosman("TeamBAttacker1").getPointY() < (canvasHeight - foosmanHeight)) {
-                    gameBoard.teamB.movePlayers(foosmanSensitivity);
+                    gameBoard.teamB.movePlayers(FOOSMAN_SENSITIVITY);
                 }
             }
             if (upButtonDown) {
                 if (gameBoard.getFoosman("TeamBAttacker3").getPointY() > 0) {
-                    gameBoard.teamB.movePlayers(-foosmanSensitivity);
+                    gameBoard.teamB.movePlayers(-FOOSMAN_SENSITIVITY);
                 }
             }
         }
@@ -263,7 +268,8 @@ public class GameActivity extends FullScreenActivity {
         // Pulls ball and foosmen positions from the db
         database.startGameDataListener(new GameDataListener() {
             @Override
-            public void onSuccess(int x, int y, int vx, int vy, int fya, int fyb) {
+            public void onSuccess(int x, int y, int vx, int vy, int fya, int fyb, int scoreA,
+                                  int scoreB) {
 
                 if (!isGameHost) {
                     gameBoard.teamA.setYCord(fya);
@@ -272,6 +278,18 @@ public class GameActivity extends FullScreenActivity {
                         ballVelocity.y = vy;
                     }
                     gameBoard.b.setPoint(x, y);
+                    if (scoreA > gameBoard.goalB.getConceeded()) {
+                        assert scoreA - gameBoard.goalB.getConceeded() == 1;
+                        gameBoard.goalB.scoreGoal();
+                        scoreGoal("Team A");
+                        setUpNewRound();
+                    }
+                    if (scoreB > gameBoard.goalA.getConceeded()) {
+                        assert scoreB - gameBoard.goalA.getConceeded() == 1;
+                        gameBoard.goalA.scoreGoal();
+                        scoreGoal("Team B");
+                        setUpNewRound();
+                    }
                 } else {
                     gameBoard.teamB.setYCord(fyb);
                 }
@@ -284,13 +302,21 @@ public class GameActivity extends FullScreenActivity {
         });
     }
 
-    private Point getRandomVelocity() {
-        // Random r = new Random();
-        // int min = 3;
-        // int max = 6;
-        // int x = r.nextInt(max - min + 1) + min;
-        // int y = r.nextInt(max - min + 1) + min;
-        return new Point(12, 8);
+    private Point getRandomStartingVelocity() {
+        final int i = new Random().nextInt(4);
+        switch (i) {
+            case 0:
+                return new Point(INITIAL_SPEED_X, INITIAL_SPEED_Y);
+            case 1:
+                return new Point(INITIAL_SPEED_X, -INITIAL_SPEED_Y);
+            case 2:
+                return new Point(-INITIAL_SPEED_X, INITIAL_SPEED_Y);
+            case 3:
+                return new Point(-INITIAL_SPEED_X, -INITIAL_SPEED_Y);
+            default:
+                throw new UnsupportedOperationException(
+                        "Only should have 4 different cases for starting velocity");
+        }
     }
 
     /**
@@ -343,7 +369,7 @@ public class GameActivity extends FullScreenActivity {
         gameBoard.goalA.setGoalPoints(5, (int) (canvasHeight * 0.7), (int) (canvasHeight * 0.3));
         gameBoard.goalB.setGoalPoints(canvasWidth - 5, (int) (canvasHeight * 0.7), (int) (canvasHeight * 0.3));
 
-        setUpRound();
+        setUpNewRound();
 
         ballMaxX = canvasWidth - ballWidth;
         ballMaxY = canvasHeight - ballHeight;
@@ -354,14 +380,15 @@ public class GameActivity extends FullScreenActivity {
         frame.postDelayed(frameUpdate, FRAME_RATE);
     }
 
-    private void setUpRound() {
-        gameBoard.stopBallRotation();
+    private void setUpNewRound() {
         ballVelocity = new Point(0, 0);
-        // ballVelocity = getRandomVelocity();
-        displaySnackbar("Starting in 3..");
-        new Handler().postDelayed(() -> displaySnackbar("Starting in 2.."), 1000);
-        new Handler().postDelayed(() -> displaySnackbar("Starting in 1.."), 2000);
-        new Handler().postDelayed(this::startRound, 3000);
+        gameBoard.b.setPoint((int) (canvasWidth * 0.5), (int) (canvasHeight * 0.5));
+        gameBoard.stopBallRotation();
+        final Handler h = new Handler();
+        h.postDelayed(() -> displaySnackbar("Starting in 3.."), 1000);
+        h.postDelayed(() -> displaySnackbar("Starting in 2.."), 2000);
+        h.postDelayed(() -> displaySnackbar("Starting in 1.."), 3000);
+        h.postDelayed(this::startRound, 4000);
     }
 
     private void displaySnackbar(String message) {
@@ -373,8 +400,17 @@ public class GameActivity extends FullScreenActivity {
     }
 
     private void startRound() {
-        ballVelocity = new Point(12, 8);
+        ballVelocity = getRandomStartingVelocity();
         gameBoard.startBallRotation();
+    }
+
+    private void scoreGoal(String name) {
+        Snackbar.make(findViewById(R.id.game_root), name + " GOAL!!!",
+                Snackbar.LENGTH_LONG).show();
+        final TextView viewScoreTeamA = findViewById(R.id.scoreTeamA);
+        final TextView viewScoreTeamB = findViewById(R.id.scoreTeamB);
+        viewScoreTeamA.setText(String.format(Locale.ENGLISH, "%d", gameBoard.goalB.getConceeded()));
+        viewScoreTeamB.setText(String.format(Locale.ENGLISH, "%d", gameBoard.goalA.getConceeded()));
     }
 
     /**
@@ -407,36 +443,47 @@ public class GameActivity extends FullScreenActivity {
 
             frame.removeCallbacks(frameUpdate);
 
+            updateVelocity();
             if (checkCollision(gameBoard.b, foosmanList)) {
                 handleCollision();
             }
             moveFoosman();
-            updateVelocity();
 
-            Point ball = new Point(gameBoard.b.getPointX(),
-                    gameBoard.b.getPointY());
+            Point ball = new Point(gameBoard.b.getPointX(), gameBoard.b.getPointY());
             ball.x = ball.x + ballVelocity.x;
             ball.y = ball.y + ballVelocity.y;
+            gameBoard.b.setPoint(ball.x, ball.y);
 
-            if (ball.x > ballMaxX || ball.x < 5) {
-                if (gameBoard.goalB.checkGoal(ball.y, findViewById(R.id.the_canvas))
-                        || gameBoard.goalA.checkGoal(ball.y, findViewById(R.id.the_canvas))) {
-                    ball.x = (int) (canvasWidth * 0.5);
-                    ball.y = (int) (canvasHeight * 0.5);
-                    setUpRound();
-                } else {
-                    ballVelocity.x *= -1;
+            if (ball.x > ballMaxX) {
+                ballVelocity.x = -Math.abs(ballVelocity.x);
+                if (isGameHost) {
+                    if (gameBoard.goalB.checkGoal(ball.y)) {
+                        setUpNewRound();
+                        scoreGoal("Team A");
+                    }
                 }
             }
-            if (ball.y > ballMaxY || ball.y < 5) {
-                ballVelocity.y *= -1;
+            if (ball.x < 5) {
+                ballVelocity.x = Math.abs(ballVelocity.x);
+                if (isGameHost) {
+                    if (gameBoard.goalA.checkGoal(ball.y)) {
+                        setUpNewRound();
+                        scoreGoal("Team B");
+                    }
+                }
             }
-            gameBoard.b.setPoint(ball.x, ball.y);
+            if (ball.y > ballMaxY) {
+                ballVelocity.y = -Math.abs(ballVelocity.y);
+            }
+            if (ball.y < 5) {
+                ballVelocity.y = Math.abs(ballVelocity.y);
+            }
 
             // This assumes 2 player game and sends coords to db
             if (isGameHost) {
                 database.updateCoordsHost(ball.x, ball.y, ballVelocity.x, ballVelocity.y,
-                        gameBoard.teamA.getYCord());
+                        gameBoard.teamA.getYCord(), gameBoard.goalB.getConceeded(),
+                        gameBoard.goalA.getConceeded());
             } else {
                 database.updateCoords(gameBoard.teamB.getYCord());
             }
