@@ -36,11 +36,10 @@ import android.view.View;
 
 public class GameBoard extends View {
 
-    // Bitmaps
+    // Create board items
     private Bitmap bmTeamA = BitmapFactory.decodeResource(getResources(), R.drawable.ship1);
     private Bitmap bmTeamB = BitmapFactory.decodeResource(getResources(), R.drawable.ship2);
     private Bitmap bmBall = BitmapFactory.decodeResource(getResources(), R.drawable.ball);
-
     public FoosmenTeam teamA = new FoosmenTeam(getHeight()/2);
     public FoosmenTeam teamB = new FoosmenTeam(getHeight()/2);
     public Goal goalA = new Goal("Team A Goal");
@@ -50,8 +49,6 @@ public class GameBoard extends View {
     private List<String> foosmanNames = Arrays.asList("TeamAGoalie", "TeamADefender1",
             "TeamADefender2", "TeamAAttacker1", "TeamAAttacker2", "TeamAAttacker3", "TeamBGoalie",
             "TeamBDefender1", "TeamBDefender2", "TeamBAttacker1", "TeamBAttacker2", "TeamBAttacker3");
-
-
     private final Map<String, Foosman> foosmanMap = new TreeMap<String, Foosman>();
     synchronized public Foosman getFoosman(String name) {
         return foosmanMap.get(name);
