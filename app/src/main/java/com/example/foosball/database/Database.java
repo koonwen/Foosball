@@ -232,14 +232,18 @@ public class Database {
      * @param vx x velocity of the ball.
      * @param vy y-velocity of the ball.
      * @param fya y-position of the team A foosmen.
+     * @param scoreA Score for team A.
+     * @param scoreB Score for team B.
      */
-    public void updateCoordsHost(int x, int y, int vx, int vy, int fya) {
+    public void updateCoordsHost(int x, int y, int vx, int vy, int fya, int scoreA, int scoreB) {
         final DatabaseReference refGameData = ref.child(KEY_GAME_DATA);
         refGameData.child(KEY_BALL_X).setValue(x);
         refGameData.child(KEY_BALL_Y).setValue(y);
         refGameData.child(KEY_BALL_VX).setValue(vx);
         refGameData.child(KEY_BALL_VY).setValue(vy);
         refGameData.child(KEY_FOOSMEN_Y_TEAM_A).setValue(fya);
+        refGameData.child(KEY_SCORE_TEAM_A).setValue(scoreA);
+        refGameData.child(KEY_SCORE_TEAM_B).setValue(scoreB);
     }
 
     /**
@@ -267,8 +271,11 @@ public class Database {
                 final Object vyObj = dataSnapshot.child(KEY_BALL_VY).getValue();
                 final Object fyaObj = dataSnapshot.child(KEY_FOOSMEN_Y_TEAM_A).getValue();
                 final Object fybObj = dataSnapshot.child(KEY_FOOSMEN_Y_TEAM_B).getValue();
-                if (xObj == null || yObj == null || vxObj == null || vyObj == null ||
-                        fyaObj == null || fybObj == null) {
+                final Object scoreAObj = dataSnapshot.child(KEY_SCORE_TEAM_A).getValue();
+                final Object scoreBObj = dataSnapshot.child(KEY_SCORE_TEAM_B).getValue();
+                if (xObj == null || yObj == null || vxObj == null || vyObj == null
+                        || fyaObj == null || fybObj == null
+                        || scoreAObj == null || scoreBObj == null) {
                     Log.d(TAG, "Coordinates have not been initialised");
                     return;
                 }
@@ -278,7 +285,9 @@ public class Database {
                 final int vy = ((Long) vyObj).intValue();
                 final int fya = ((Long) fyaObj).intValue();
                 final int fyb = ((Long) fybObj).intValue();
-                gameDataListener.onSuccess(x, y, vx, vy, fya, fyb);
+                final int scoreA = ((Long) scoreAObj).intValue();
+                final int scoreB = ((Long) scoreBObj).intValue();
+                gameDataListener.onSuccess(x, y, vx, vy, fya, fyb, scoreA, scoreB);
             }
 
             @Override
