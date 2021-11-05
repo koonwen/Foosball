@@ -19,11 +19,11 @@ import com.example.foosball.drawing.GameBoard;
 import com.example.foosball.models.Ball;
 import com.example.foosball.models.Foosman;
 import com.example.foosball.utils.Utils;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 /**
  * This acts as an Game Engine. It initiates the positions of all elements including the ball
@@ -67,29 +67,20 @@ public class GameActivity extends FullScreenActivity {
     private void updateVelocity() {
         int xDir = (ballVelocity.x > 0) ? 1 : -1;
         int yDir = (ballVelocity.y > 0) ? 1 : -1;
-        int speed;
-        if (ballVelocity.x > 12) {
-            speed = Math.abs(ballVelocity.x) - 1;
-        } else {
-            speed = Math.abs(ballVelocity.x);
+        int xSpeed = Math.abs(ballVelocity.x);
+        int ySpeed = Math.abs(ballVelocity.y);
+        if (xSpeed + ySpeed > 20) {
+            xSpeed -= 1;
+            ySpeed -= 1;
         }
-        ballVelocity.x = speed * xDir;
-        ballVelocity.y = speed * yDir;
-        //        int speed = 0;
-        //        if (isAccelerating) {
-        //            speed = Math.abs(ballVelocity.x)+1;
-        //        } else {
-        //            speed = Math.abs(ballVelocity.x)-1;
-        //        }
-        //        if (speed>8) speed =8;
-        //        if (speed<1) speed =1;
-        //        ballVelocity.x=speed*xDir;
-        //        ballVelocity.y=speed*yDir;
+        ballVelocity.x = xSpeed * xDir;
+        ballVelocity.y = ySpeed * yDir;
     }
 
     /**
      * Checks if there is a collision between the ball and any foosmen
      * Collision model for foosman and ball are rectangles
+     *
      * @param b Ball
      * @param foosmanList List of foosmen
      * @return Boolean if there is a detected collision
@@ -158,12 +149,17 @@ public class GameActivity extends FullScreenActivity {
      * to ball if there is collision detected
      */
     private void handleCollision() {
-        if (ballVelocity.x < 20) {
-            ballVelocity.x *= 1.1;
+        int xDir = (ballVelocity.x > 0) ? 1 : -1;
+        int yDir = (ballVelocity.y > 0) ? 1 : -1;
+        int xSpeed = Math.abs(ballVelocity.x);
+        int ySpeed = Math.abs(ballVelocity.y);
+        if (xSpeed + ySpeed < 40) {
+            xSpeed += 10;
+            ySpeed += 10;
         }
-        if (ballVelocity.y < 20) {
-            ballVelocity.y *= 1.1;
-        }
+        ballVelocity.x = xSpeed * xDir;
+        ballVelocity.y = ySpeed * yDir;
+
         if (collisionFromTop) {
             ballVelocity.y = -Math.abs(ballVelocity.y);
             collisionFromTop = false;
@@ -184,7 +180,7 @@ public class GameActivity extends FullScreenActivity {
      * This method is called when the user presses the 'Up' or 'Down' buttons on screen.
      * It checks if `upButtonDown` or `downButtonDown` are true and then checks if the
      * foosmen closest to the canvas top and bottom edges are within a distance of 50.
-     *
+     * <p>
      * If false, it specifies a new position for each foosmen by the value defined by
      * `foosmanSensitivity` in the Y-direction.
      */
@@ -218,6 +214,7 @@ public class GameActivity extends FullScreenActivity {
 
     /**
      * Starts the game activity
+     *
      * @param savedInstanceState
      */
     @Override
@@ -296,12 +293,12 @@ public class GameActivity extends FullScreenActivity {
     }
 
     private Point getRandomVelocity() {
-        Random r = new Random();
-        int min = 3;
-        int max = 6;
-        int x = r.nextInt(max - min + 1) + min;
-        int y = r.nextInt(max - min + 1) + min;
-        return new Point(x, y);
+        // Random r = new Random();
+        // int min = 3;
+        // int max = 6;
+        // int x = r.nextInt(max - min + 1) + min;
+        // int y = r.nextInt(max - min + 1) + min;
+        return new Point(12, 8);
     }
 
     /**
@@ -354,7 +351,7 @@ public class GameActivity extends FullScreenActivity {
         gameBoard.goalA.setGoalPoints(5, (int) (canvasHeight * 0.7), (int) (canvasHeight * 0.3));
         gameBoard.goalB.setGoalPoints(canvasWidth - 5, (int) (canvasHeight * 0.7), (int) (canvasHeight * 0.3));
 
-        ballVelocity = new Point(10, -2);
+        setUpRound();
 
         ballMaxX = canvasWidth - ballWidth;
         ballMaxY = canvasHeight - ballHeight;
@@ -365,8 +362,32 @@ public class GameActivity extends FullScreenActivity {
         frame.postDelayed(frameUpdate, FRAME_RATE);
     }
 
+    private void setUpRound() {
+        gameBoard.stopBallRotation();
+        ballVelocity = new Point(0, 0);
+        // ballVelocity = getRandomVelocity();
+        displaySnackbar("Starting in 3..");
+        new Handler().postDelayed(() -> displaySnackbar("Starting in 2.."), 1000);
+        new Handler().postDelayed(() -> displaySnackbar("Starting in 1.."), 2000);
+        new Handler().postDelayed(this::startRound, 3000);
+    }
+
+    private void displaySnackbar(String message) {
+        Snackbar snackbar = Snackbar.make(findViewById(R.id.game_root), message, 700);
+        Snackbar.SnackbarLayout layout = (Snackbar.SnackbarLayout) snackbar.getView();
+        layout.setPadding(0, 0, 0, 0);
+        snackbar.show();
+
+    }
+
+    private void startRound() {
+        ballVelocity = new Point(12, 8);
+        gameBoard.startBallRotation();
+    }
+
     /**
      * Starts the end game activity with the saved number of goals for each team
+     *
      * @param view
      */
     public void endGame(View view) {
@@ -392,6 +413,8 @@ public class GameActivity extends FullScreenActivity {
                 return;
             }
 
+            Log.d("Ball velocity", ballVelocity.x + ", " + ballVelocity.y);
+
             frame.removeCallbacks(frameUpdate);
 
             if (checkCollision(gameBoard.b, foosmanList)) {
@@ -406,19 +429,14 @@ public class GameActivity extends FullScreenActivity {
             ball.y = ball.y + ballVelocity.y;
 
             if (ball.x > ballMaxX || ball.x < 5) {
-                if (ball.x > ballMaxX) {
-                    if (gameBoard.goalB.checkGoal(ball.y, findViewById(R.id.the_canvas))) {
-                        ball.x = (int) (canvasWidth * 0.5);
-                        ball.y = (int) (canvasHeight * 0.5);
-
-                    }
+                if (gameBoard.goalB.checkGoal(ball.y, findViewById(R.id.the_canvas))
+                        || gameBoard.goalA.checkGoal(ball.y, findViewById(R.id.the_canvas))) {
+                    ball.x = (int) (canvasWidth * 0.5);
+                    ball.y = (int) (canvasHeight * 0.5);
+                    setUpRound();
                 } else {
-                    if (gameBoard.goalA.checkGoal(ball.y, findViewById(R.id.the_canvas))) {
-                        ball.x = (int) (canvasWidth * 0.5);
-                        ball.y = (int) (canvasHeight * 0.5);
-                    }
+                    ballVelocity.x *= -1;
                 }
-                ballVelocity.x *= -1;
             }
             if (ball.y > ballMaxY || ball.y < 5) {
                 ballVelocity.y *= -1;
