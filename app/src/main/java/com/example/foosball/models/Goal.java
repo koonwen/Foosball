@@ -55,11 +55,13 @@ public class Goal {
      * @param y
      * @param view
      */
-    public void checkGoal(int y, View view) {
+    public boolean checkGoal(int y, View view) {
         if (y < topY && y > bottomY) {
             conceeded += 1;
             Snackbar.make(view, "GOAL!!! " + name + " conceeded " + conceeded + " goals", BaseTransientBottomBar.LENGTH_LONG).show();
+            return true;
         }
+        return false;
     }
 
     /**
