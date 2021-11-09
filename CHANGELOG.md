@@ -111,3 +111,10 @@ TODO:
 ### 4 November 2021
 *Update by Eddie & Koon*
 1. Add goal and scoring functionality
+
+### 4 November 2021
+*Update by Eddie and Bernard*
+1. Refine ball collision model
+
+### 5 November 2021
+1. Add unit tests for lobby and game models
